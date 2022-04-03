@@ -1,0 +1,8 @@
+file_format: "1"
+id: btrfld
+name: btrfld
+type: shield
+url: https://github.com/SolidHal/btrfld
+requires: [pro_micro]
+features:
+  - keys
