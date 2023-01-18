@@ -15,11 +15,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <drivers/display.h>
 #include <lvgl.h>
 
+#include "theme.h"
+
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 #include <zmk/display/status_screen.h>
 
-#define ZMK_DISPLAY_NAME CONFIG_LVGL_DISPLAY_DEV_NAME
+#define ZMK_DISPLAY_NAME CONFIG_LV_Z_DISPLAY_DEV_NAME
 
 static const struct device *display;
 static bool initialized = false;
@@ -50,10 +52,7 @@ struct k_work_q *zmk_display_work_q() {
 #endif
 }
 
-void display_timer_cb() {
-    lv_tick_inc(TICK_MS);
-    k_work_submit_to_queue(zmk_display_work_q(), &display_tick_work);
-}
+void display_timer_cb() { k_work_submit_to_queue(zmk_display_work_q(), &display_tick_work); }
 
 void blank_display_cb(struct k_work *work) { display_blanking_on(display); }
 
@@ -108,6 +107,7 @@ void initialize_display(struct k_work *work) {
     }
 
     lv_scr_load(screen);
+    zmk_display_theme_init(screen);
 
     start_display_updates();
 }
