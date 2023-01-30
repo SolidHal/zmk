@@ -73,9 +73,5 @@ lv_obj_t *zmk_display_status_screen() {
     lv_obj_align(zenlogo_icon, LV_ALIGN_BOTTOM_MID, 2, -5);
 #endif
 
-    // lv_task_handler();
-    lv_refr_now(NULL);
-    // display_blanking_off(display_dev);
-
     return screen;
 }

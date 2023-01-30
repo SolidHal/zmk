@@ -55,7 +55,6 @@ static void set_battery_symbol(lv_obj_t *label, struct battery_status_state stat
     }
 #endif
     lv_label_set_text(label, text);
-    lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
 }
 
 void battery_status_update_cb(struct battery_status_state state) {
