@@ -29,6 +29,8 @@ static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
         return zmk_endpoints_select(ZMK_ENDPOINT_USB);
     case OUT_BLE:
         return zmk_endpoints_select(ZMK_ENDPOINT_BLE);
+    case OUT_SHO:
+      return zmk_endpoints_show();
     default:
         LOG_ERR("Unknown output command: %d", binding->param1);
     }

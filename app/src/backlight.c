@@ -34,6 +34,8 @@ static const struct device *const backlight_dev = DEVICE_DT_GET(DT_CHOSEN(zmk_ba
 
 #define BRT_MAX 100
 
+#define LED_SHOW_DELAY 2000 // 2 seconds
+
 struct backlight_state {
     uint8_t brightness;
     bool on;
@@ -78,11 +80,25 @@ static void backlight_save_work_handler(struct k_work *work) {
 static struct k_work_delayable backlight_save_work;
 #endif
 
+
+static void zmk_led_all_off() {
+  for (int i = 0; i < BACKLIGHT_NUM_LEDS; i++) {
+    int rc = led_set_brightness(backlight_dev, i, 0);
+  }
+}
+
+static void zmk_led_all_off_handler(struct k_work *work) {
+  zmk_led_all_off();
+}
+
+static struct k_work_delayable zmk_led_all_off_callback;
+
 static int zmk_backlight_init(const struct device *_arg) {
     if (!device_is_ready(backlight_dev)) {
         LOG_ERR("Backlight device \"%s\" is not ready", backlight_dev->name);
         return -ENODEV;
     }
+    k_work_init_delayable(&zmk_led_all_off_callback, zmk_led_all_off_handler);
 
 #if IS_ENABLED(CONFIG_SETTINGS)
     settings_subsys_init();
@@ -146,6 +162,33 @@ uint8_t zmk_backlight_calc_brt_cycle() {
     } else {
         return zmk_backlight_calc_brt(1);
     }
+}
+
+int zmk_led_on(uint32_t led) {
+  return led_set_brightness(backlight_dev, led, 20);
+}
+
+
+int zmk_led_off(uint32_t led) {
+  return led_set_brightness(backlight_dev, led, 0);
+}
+
+// takes a bitmap of leds to enable for a short time
+int zmk_led_show(uint32_t ledbitmap) {
+  zmk_led_all_off();
+
+  int rc = 0;
+  for (uint32_t i = 0; i < BACKLIGHT_NUM_LEDS; i++) {
+    if (ledbitmap & (1 << i)) {
+        rc = zmk_led_on(i);
+        if (rc != 0) {
+          return rc;
+        }
+    }
+  }
+
+  int ret = k_work_reschedule(&zmk_led_all_off_callback, K_MSEC(LED_SHOW_DELAY));
+  return MIN(ret, 0);
 }
 
 #if IS_ENABLED(CONFIG_ZMK_BACKLIGHT_AUTO_OFF_IDLE) || IS_ENABLED(CONFIG_ZMK_BACKLIGHT_AUTO_OFF_USB)

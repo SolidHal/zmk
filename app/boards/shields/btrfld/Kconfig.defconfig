@@ -6,4 +6,10 @@ if SHIELD_BTRFLD
 config ZMK_KEYBOARD_NAME
     default "btrfld"
 
+config ZMK_BACKLIGHT
+    select LED
+    select LED_GPIO
+    select PWM
+    select LED_PWM
+
 endif

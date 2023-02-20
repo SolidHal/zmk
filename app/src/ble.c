@@ -36,6 +36,12 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/event_manager.h>
 #include <zmk/events/ble_active_profile_changed.h>
 
+#if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
+
+#include <zmk/backlight.h>
+
+#endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
+
 #if IS_ENABLED(CONFIG_ZMK_BLE_PASSKEY_ENTRY)
 #include <zmk/events/keycode_state_changed.h>
 
@@ -52,6 +58,7 @@ static uint8_t passkey_digit = 0;
 #else
 #define PROFILE_COUNT CONFIG_BT_MAX_PAIRED
 #endif
+
 
 enum advertising_type {
     ZMK_ADV_NONE,
@@ -248,6 +255,10 @@ int zmk_ble_prof_select(uint8_t index) {
         return -ERANGE;
     }
 
+    // Use 1 based indexing for show, since displaying "0" on leds can be confused with non-function
+    // TODO add config to enable/disable showing on selection change
+    int rc = zmk_led_show(index + 1);
+    // do nothing with rc, don't want to stop changing profiles just because we have led issues
     LOG_DBG("profile %d", index);
     if (active_profile == index) {
         return 0;
@@ -262,6 +273,11 @@ int zmk_ble_prof_select(uint8_t index) {
 
     return 0;
 };
+
+int zmk_ble_prof_show() {
+    // Use 1 based indexing for show, since displaying "0" on leds can be confused with non-function
+    return zmk_led_show(active_profile + 1);
+}
 
 int zmk_ble_prof_next() {
     LOG_DBG("");
