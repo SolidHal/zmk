@@ -19,6 +19,13 @@
 #include <zmk/events/endpoint_selection_changed.h>
 
 #include <zephyr/logging/log.h>
+
+#if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
+
+#include <zmk/backlight.h>
+
+#endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
+
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define DEFAULT_ENDPOINT                                                                           \
@@ -49,6 +56,18 @@ static int endpoints_save_preferred() {
 int zmk_endpoints_select(enum zmk_endpoint endpoint) {
     LOG_DBG("Selected endpoint %d", endpoint);
 
+
+    // ignore rc, don't want to fail selecting just because of led issues
+    // do this check here, so we still show the endpoint even when not switching
+    if (endpoint == ZMK_ENDPOINT_BLE) {
+      // blue  leds are bits 0 and 2
+      int rc = zmk_led_show(5);
+    }
+    else if (endpoint == ZMK_ENDPOINT_USB) {
+      // green led is bit 1
+      int rc = zmk_led_show(2);
+    }
+
     if (preferred_endpoint == endpoint) {
         return 0;
     }
@@ -60,6 +79,17 @@ int zmk_endpoints_select(enum zmk_endpoint endpoint) {
     update_current_endpoint();
 
     return 0;
+}
+
+int zmk_endpoints_show() {
+  if (current_endpoint == ZMK_ENDPOINT_BLE) {
+    // blue  leds are bits 0 and 2
+    return zmk_led_show(5);
+  }
+  else if (current_endpoint == ZMK_ENDPOINT_USB) {
+    // green led is bit 1
+    return zmk_led_show(2);
+  }
 }
 
 enum zmk_endpoint zmk_endpoints_selected() { return current_endpoint; }

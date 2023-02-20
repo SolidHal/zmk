@@ -16,16 +16,27 @@
 #define GAME_FN_L 4
 
 
+
+
+
 / {
+
+
+// TODO need function/macro that shows the current bluetooth device in use
+// also need to modify the BT_SEL funcs so they show the bluetooth device in use for a short period after changing
+
+
+// TODO need to have similar check func/macro for output selection
+// then also when OUT_TOG is pressed, light either blue or green leds
 
 // switch the bt device depending on the number of taps on td0
     behaviors {
-        td0: tap_dance_0 {
+        out_td: tap_dance_0 {
             compatible = "zmk,behavior-tap-dance";
             label = "TAP_DANCE_0";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&bt BT_SEL 0>, <&bt BT_SEL 1>, <&bt BT_SEL 2>, <&bt BT_SEL 3>;
+            bindings = <&out OUT_SHO>, <&out OUT_BLE>, <&out OUT_USB>;
         };
     };
 
@@ -37,7 +48,7 @@
 // |    Q    |    W    |    E    |    R    |    T    |                                          |    Y    |    U    |    I    |    O    |    P    |
 // |    A    |    S    |    D    |    F    |    G    |                                          |    H    |    J    |    K    |    L    |    ;    |
 // |    Z    |    X    |    C    |    V    |    B    |                                          |    N    |    M    |    ,    |    .    |    /    |
-// | BT/USB  |  VOL_DN | VOL_UP  |                                                                                  |   LALT  |   DEL   |   bt dev td  |
+// |BT/USB td|  VOL_DN | VOL_UP  |                                                                                  |   LALT  |   DEL   |   bt sho  |
 //                               |   GUI   |   SPACE | ESC     |                      |backspace| L SHIFT |  ENTER  |
 //                                         |NUM_LAYER| l_ctrl  |                      |   TAB   |ARROW_LAYER|
 
@@ -45,7 +56,7 @@ bindings = <
       &kp Q     &kp W     &kp E     &kp R      &kp T                                               &kp Y     &kp U     &kp I     &kp O     &kp P   
       &kp A     &kp S     &kp D     &kp F      &kp G                                               &kp H     &kp J     &kp K     &kp L     &kp SEMI
       &kp Z     &kp X     &kp C     &kp V      &kp B                                               &kp N     &kp M     &kp COMMA &kp DOT   &kp FSLH
-   &out OUT_TOG &kp C_VOL_DN &kp C_VOL_UP                                                                                   &kp LALT  &kp DEL   &td0
+    &out_td &kp C_VOL_DN &kp C_VOL_UP                                                                                   &kp LALT  &kp DEL   &bt BT_SHO
                                   &kp LGUI    &kp SPC   &kp ESC                         &kp BSPC  &kp LSHFT  &kp ENTER
                                               &mo NUM_L &kp LCTRL                       &kp TAB   &mo ARROW_L
             >;
@@ -66,7 +77,7 @@ bindings = <
 bindings = <
       &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                               &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
     &bootloader  &none  &none   &none   &none                                                &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
-   &bt BT_CLR    &none &none    &none   &none                                                &none       &none       &none     &none      &to GAME_L
+   &bt BT_CLR    &none &none    &none   &none                                           &bt BT_SEL 0  &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3  &to GAME_L
       &trans    &trans  &trans                                                                                        &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
                                              &trans   &trans                        &trans   &trans
