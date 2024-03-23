@@ -251,10 +251,14 @@ int zmk_ble_prof_select(uint8_t index) {
         return -ERANGE;
     }
 
+
+#if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
     // Use 1 based indexing for show, since displaying "0" on leds can be confused with non-function
     // TODO add config to enable/disable showing on selection change
     int rc = zmk_led_show(index + 1);
     // do nothing with rc, don't want to stop changing profiles just because we have led issues
+#endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
+
     LOG_DBG("profile %d", index);
     if (active_profile == index) {
         return 0;
@@ -271,19 +275,29 @@ int zmk_ble_prof_select(uint8_t index) {
 };
 
 int zmk_ble_prof_show() {
+#if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
     // Use 1 based indexing for show, since displaying "0" on leds can be confused with non-function
     return zmk_led_show(active_profile + 1);
+#else
+    return 0;
+#endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
 }
 
 int zmk_ble_prof_next() {
-    LOG_DBG("");
+#if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
     return zmk_ble_prof_select((active_profile + 1) % ZMK_BLE_PROFILE_COUNT);
+#else
+    return 0;
+#endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
 };
 
 int zmk_ble_prof_prev() {
-    LOG_DBG("");
+#if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
     return zmk_ble_prof_select((active_profile + ZMK_BLE_PROFILE_COUNT - 1) %
                                ZMK_BLE_PROFILE_COUNT);
+#else
+    return 0;
+#endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
 };
 
 bt_addr_le_t *zmk_ble_active_profile_addr() { return &profiles[active_profile].peer; }
