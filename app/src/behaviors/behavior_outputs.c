@@ -24,11 +24,11 @@ static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
                                      struct zmk_behavior_binding_event event) {
     switch (binding->param1) {
     case OUT_TOG:
-        return zmk_endpoints_toggle();
+        return zmk_endpoints_toggle_transport();
     case OUT_USB:
-        return zmk_endpoints_select(ZMK_ENDPOINT_USB);
+        return zmk_endpoints_select_transport(ZMK_TRANSPORT_USB);
     case OUT_BLE:
-        return zmk_endpoints_select(ZMK_ENDPOINT_BLE);
+        return zmk_endpoints_select_transport(ZMK_TRANSPORT_BLE);
     case OUT_SHO:
       return zmk_endpoints_show();
     default:
@@ -44,7 +44,7 @@ static const struct behavior_driver_api behavior_outputs_driver_api = {
     .binding_pressed = on_keymap_binding_pressed,
 };
 
-DEVICE_DT_INST_DEFINE(0, behavior_out_init, NULL, NULL, NULL, APPLICATION,
-                      CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &behavior_outputs_driver_api);
+BEHAVIOR_DT_INST_DEFINE(0, behavior_out_init, NULL, NULL, NULL, POST_KERNEL,
+                        CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &behavior_outputs_driver_api);
 
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT) */

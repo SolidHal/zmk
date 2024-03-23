@@ -16,7 +16,7 @@ add a set of `#define`s at the top of your keymap file, and use those layer in y
 
 For example, if you have three layers, you can add the following to the top of your keymap:
 
-```
+```dts
 #define DEFAULT 0
 #define LOWER   1
 #define RAISE   2
@@ -37,7 +37,7 @@ again.
 
 Example:
 
-```
+```dts
 &mo LOWER
 ```
 
@@ -53,16 +53,32 @@ The "layer-tap" behavior enables a layer when a key is held, and outputs a [keyp
 
 Example:
 
-```
+```dts
 &lt LOWER SPACE
 ```
 
+### Configuration
+
+You can configure a different tapping term or tweak other properties noted in the [hold-tap](hold-tap.mdx#advanced-configuration) documentation page in your keymap:
+
+```dts
+&lt {
+    tapping-term-ms = <200>;
+};
+
+/ {
+    keymap {
+        ...
+    };
+};
+```
+
 :::info
-Functionally, the layer-tap is a [hold-tap](hold-tap.md) of the ["tap-preferred" flavor](hold-tap.md/#flavors) and a [`tapping-term-ms`](hold-tap.md/#tapping-term-ms) of 200 that takes in a [`momentary layer`](#momentary-layer) and a [keypress](key-press.md) as its "hold" and "tap" parameters, respectively.
+Functionally, the layer-tap is a [hold-tap](hold-tap.mdx) of the ["tap-preferred" flavor](hold-tap.mdx#flavors) and a [`tapping-term-ms`](hold-tap.mdx#tapping-term-ms) of 200 that takes in a [`momentary layer`](#momentary-layer) and a [keypress](key-press.md) as its "hold" and "tap" parameters, respectively.
 
 For users who want to send a different [keycode](../codes/index.mdx) depending on if the same key is held or tapped, see [Mod-Tap](mod-tap.md).
 
-Similarly, for users looking to create a keybind like the layer-tap that depending on how long the key is held, invokes behaviors like [sticky keys](sticky-key.md) or [key toggles](key-toggle.md), see [Hold-Tap](hold-tap.md).
+Similarly, for users looking to create a keybind like the layer-tap that depending on how long the key is held, invokes behaviors like [sticky keys](sticky-key.md) or [key toggles](key-toggle.md), see [Hold-Tap](hold-tap.mdx).
 
 :::
 
@@ -77,7 +93,7 @@ The "to layer" behavior enables a layer and disables _all_ other layers _except_
 
 Example:
 
-```
+```dts
 &to 3
 ```
 
@@ -92,13 +108,13 @@ The "toggle layer" behavior enables a layer until the layer is manually disabled
 
 Example:
 
-```
+```dts
 &tog LOWER
 ```
 
 "Toggle layer" for a :
 
-```
+```dts
 #define DEFAULT 0
 #define NAVI    1
 
