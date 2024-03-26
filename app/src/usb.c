@@ -61,6 +61,7 @@ void usb_status_cb(enum usb_dc_status_code status, const uint8_t *params) {
         zmk_usb_hid_set_protocol(HID_PROTOCOL_REPORT);
     }
 #endif
+
     usb_status = status;
     k_work_submit(&usb_status_notifier_work);
 };

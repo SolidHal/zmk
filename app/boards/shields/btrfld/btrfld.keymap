@@ -1,5 +1,6 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/midi.h>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/outputs.h>
 
@@ -13,7 +14,15 @@
 #define NUM_L      1
 #define ARROW_L    2
 #define GAME_L     3
-#define GAME_FN_L 4
+#define GAME_FN_L  4
+
+#define MIDI_BASE 5
+
+#define MIDI_C_DN2  6
+#define MIDI_C_DN1  7
+#define MIDI_C  8
+#define MIDI_C_UP1  9
+#define MIDI_C_UP2  10
 
 
 
@@ -69,7 +78,7 @@ bindings = <
         arrow_layer {
 bindings = <
       &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                               &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
-    &bootloader  &none  &none   &none   &none                                                &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
+    &bootloader  &none  &none   &none   &to MIDI_BASE                                                 &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
    &bt BT_CLR    &none &none    &none   &none                                                &kp HOME    &none       &none     &kp END    &to GAME_L
       &trans    &trans  &trans                                                                                        &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
@@ -99,5 +108,77 @@ bindings = <
             >;
         };
 
+
+        midi_base {
+bindings = <
+   &none   &none  &none    &none &midi SUSTAIN                                      &midi SOSTENUTO    &none   &none  &none     &none
+   &none   &none  &to MIDI_C    &none   &none                                              &none     &none   &none  &none     &none
+   &none   &none  &none    &none      &none                                              &none     &none   &none  &none     &none
+   &to DEFAULT_L   &none  &none                                                                             &none  &none     &none
+                                             &none  &none &none     &none  &none &none
+                                                    &none &none     &none  &none
+            >;
+        };
+
+
+
+        midi_C_down_2 {
+bindings = <
+   &midi NOTE_Fs_1  &midi NOTE_As_1  &midi NOTE_Cs_2   &none             &midi SUSTAIN                                 &midi SOSTENUTO   &none             &midi NOTE_Cs_3  &midi NOTE_As_2     &midi NOTE_Fs_2
+   &midi NOTE_F_1   &midi NOTE_A_1   &midi NOTE_C_2    &midi NOTE_E_2    &none                                         &to MIDI_C_DN1    &midi NOTE_E_3    &midi NOTE_C_3   &midi NOTE_A_2     &midi NOTE_F_2
+   &midi NOTE_E_1   &midi NOTE_G_1   &midi NOTE_B_1    &midi NOTE_D_2    &midi NOTE_Ds_2                               &midi NOTE_Ds_3   &midi NOTE_D_3    &midi NOTE_B_2   &midi NOTE_G_2     &midi NOTE_E_2
+   &to DEFAULT_L    &midi NOTE_Gs_1  &none                                                                                                                 &none            &midi NOTE_Gs_2     &none
+                                                     &midi NOTE_Fs_2  &midi NOTE_G_2 &midi NOTE_Gs_2     &midi NOTE_Gs_3  &midi NOTE_G_3  &midi NOTE_Fs_3
+                                                                      &midi NOTE_F_2 &to MIDI_BASE       &to MIDI_BASE    &midi NOTE_F_3
+            >;
+        };
+
+        midi_C_down_1 {
+bindings = <
+   &midi NOTE_Fs_2  &midi NOTE_As_2  &midi NOTE_Cs_3   &none             &midi SUSTAIN                                 &midi SOSTENUTO   &none             &midi NOTE_Cs_4  &midi NOTE_As_3     &midi NOTE_Fs_3
+   &midi NOTE_F_2   &midi NOTE_A_2   &midi NOTE_C_3    &midi NOTE_E_3    &to MIDI_C_DN2                                &to MIDI_C    &midi NOTE_E_4    &midi NOTE_C_4   &midi NOTE_A_3     &midi NOTE_F_3
+   &midi NOTE_E_2   &midi NOTE_G_2   &midi NOTE_B_2    &midi NOTE_D_3    &midi NOTE_Ds_3                               &midi NOTE_Ds_4   &midi NOTE_D_4    &midi NOTE_B_3   &midi NOTE_G_3     &midi NOTE_E_3
+   &to DEFAULT_L    &midi NOTE_Gs_2  &none                                                                                                                 &none            &midi NOTE_Gs_3     &none
+                                                     &midi NOTE_Fs_3  &midi NOTE_G_3 &midi NOTE_Gs_3     &midi NOTE_Gs_4  &midi NOTE_G_4  &midi NOTE_Fs_4
+                                                                      &midi NOTE_F_3 &to MIDI_BASE       &to MIDI_BASE    &midi NOTE_F_4
+            >;
+        };
+
+
+        midi_C_center {
+bindings = <
+   &midi NOTE_Fs_3  &midi NOTE_As_3  &midi NOTE_Cs_4   &none             &midi SUSTAIN                                 &midi SOSTENUTO   &none             &midi NOTE_Cs_5  &midi NOTE_As_4     &midi NOTE_Fs_4
+   &midi NOTE_F_3   &midi NOTE_A_3   &midi NOTE_C_4    &midi NOTE_E_4    &to MIDI_C_DN1                                &to MIDI_C_UP1    &midi NOTE_E_5    &midi NOTE_C_5   &midi NOTE_A_4     &midi NOTE_F_4
+   &midi NOTE_E_3   &midi NOTE_G_3   &midi NOTE_B_3    &midi NOTE_D_4    &midi NOTE_Ds_4                               &midi NOTE_Ds_5   &midi NOTE_D_5    &midi NOTE_B_4   &midi NOTE_G_4     &midi NOTE_E_4
+   &to DEFAULT_L    &midi NOTE_Gs_3  &none                                                                                                                 &none            &midi NOTE_Gs_4     &none
+                                                     &midi NOTE_Fs_4  &midi NOTE_G_4 &midi NOTE_Gs_4     &midi NOTE_Gs_5  &midi NOTE_G_5  &midi NOTE_Fs_5
+                                                                      &midi NOTE_F_4 &to MIDI_BASE       &to MIDI_BASE    &midi NOTE_F_5
+            >;
+        };
+
+        midi_C_up_1 {
+bindings = <
+   &midi NOTE_Fs_4  &midi NOTE_As_4  &midi NOTE_Cs_5   &none             &midi SUSTAIN                                 &midi SOSTENUTO   &none             &midi NOTE_Cs_6  &midi NOTE_As_5     &midi NOTE_Fs_5
+   &midi NOTE_F_4   &midi NOTE_A_4   &midi NOTE_C_5    &midi NOTE_E_5    &to MIDI_C                                    &to MIDI_C_UP2    &midi NOTE_E_6    &midi NOTE_C_6   &midi NOTE_A_5     &midi NOTE_F_5
+   &midi NOTE_E_4   &midi NOTE_G_4   &midi NOTE_B_4    &midi NOTE_D_5    &midi NOTE_Ds_5                               &midi NOTE_Ds_6   &midi NOTE_D_6    &midi NOTE_B_5   &midi NOTE_G_5     &midi NOTE_E_5
+   &to DEFAULT_L    &midi NOTE_Gs_4  &none                                                                                                                 &none            &midi NOTE_Gs_5     &none
+                                                     &midi NOTE_Fs_5  &midi NOTE_G_5 &midi NOTE_Gs_5     &midi NOTE_Gs_6  &midi NOTE_G_6  &midi NOTE_Fs_6
+                                                                      &midi NOTE_F_5 &to MIDI_BASE       &to MIDI_BASE    &midi NOTE_F_6
+            >;
+        };
+
+        midi_C_up_2 {
+bindings = <
+   &midi NOTE_Fs_5  &midi NOTE_As_5  &midi NOTE_Cs_6   &none             &midi SUSTAIN                                 &midi SOSTENUTO   &none             &midi NOTE_Cs_7  &midi NOTE_As_6     &midi NOTE_Fs_6
+   &midi NOTE_F_5   &midi NOTE_A_5   &midi NOTE_C_6    &midi NOTE_E_6    &to MIDI_C_DN1                                &none             &midi NOTE_E_7    &midi NOTE_C_7   &midi NOTE_A_6     &midi NOTE_F_6
+   &midi NOTE_E_5   &midi NOTE_G_5   &midi NOTE_B_5    &midi NOTE_D_6    &midi NOTE_Ds_6                               &midi NOTE_Ds_7   &midi NOTE_D_7    &midi NOTE_B_6   &midi NOTE_G_6     &midi NOTE_E_6
+   &to DEFAULT_L    &midi NOTE_Gs_5  &none                                                                                                                 &none            &midi NOTE_Gs_6     &none
+                                                     &midi NOTE_Fs_6  &midi NOTE_G_6 &midi NOTE_Gs_6     &midi NOTE_Gs_7  &midi NOTE_G_7  &midi NOTE_Fs_7
+                                                                      &midi NOTE_F_6 &to MIDI_BASE       &to MIDI_BASE    &midi NOTE_F_7
+            >;
+        };
+
+
     };
 };
+
