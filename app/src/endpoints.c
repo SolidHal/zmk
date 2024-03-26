@@ -267,12 +267,43 @@ int zmk_endpoints_send_mouse_report() {
         return -ENOTSUP;
 #endif /* IS_ENABLED(CONFIG_ZMK_BLE) */
     }
-    }
 
     LOG_ERR("Unhandled endpoint transport %d", current_instance.transport);
     return -ENOTSUP;
 }
 #endif // IS_ENABLED(CONFIG_ZMK_MOUSE)
+
+
+#if IS_ENABLED(CONFIG_ZMK_MIDI)
+int zmk_endpoints_send_midi_report() {
+    switch (current_instance.transport) {
+    case ZMK_TRANSPORT_USB: {
+#if IS_ENABLED(CONFIG_ZMK_USB)
+        int err = zmk_usb_send_midi_report();
+        if (err) {
+            LOG_ERR("FAILED TO SEND OVER USB: %d", err);
+        }
+        return err;
+#else
+        LOG_ERR("USB endpoint is not supported");
+        return -ENOTSUP;
+#endif /* IS_ENABLED(CONFIG_ZMK_USB) */
+    }
+
+    case ZMK_TRANSPORT_BLE: {
+#if IS_ENABLED(CONFIG_ZMK_BLE)
+        LOG_ERR("BLE midi endpoint is not supported");
+        return -ENOTSUP;
+#else
+        LOG_ERR("BLE midi endpoint is not supported");
+        return -ENOTSUP;
+#endif /* IS_ENABLED(CONFIG_ZMK_BLE) */
+    }
+
+    LOG_ERR("Unhandled endpoint transport %d", current_instance.transport);
+    return -ENOTSUP;
+}
+#endif // IS_ENABLED(CONFIG_ZMK_MIDI)
 
 #if IS_ENABLED(CONFIG_SETTINGS)
 
