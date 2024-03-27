@@ -14,6 +14,7 @@
 #include <zmk/hid.h>
 #include <dt-bindings/zmk/hid_usage_pages.h>
 #include <zmk/usb_hid.h>
+#include <zmk/usb_midi.h>
 #include <zmk/hog.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/ble_active_profile_changed.h>
@@ -267,6 +268,7 @@ int zmk_endpoints_send_mouse_report() {
         return -ENOTSUP;
 #endif /* IS_ENABLED(CONFIG_ZMK_BLE) */
     }
+    }
 
     LOG_ERR("Unhandled endpoint transport %d", current_instance.transport);
     return -ENOTSUP;
@@ -298,6 +300,7 @@ int zmk_endpoints_send_midi_report() {
         LOG_ERR("BLE midi endpoint is not supported");
         return -ENOTSUP;
 #endif /* IS_ENABLED(CONFIG_ZMK_BLE) */
+    }
     }
 
     LOG_ERR("Unhandled endpoint transport %d", current_instance.transport);

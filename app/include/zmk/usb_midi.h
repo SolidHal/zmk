@@ -365,3 +365,6 @@ struct usb_midi_config {
         sizeof(struct usb_midi_bulk_out_ep_descriptor) +                            \
         sizeof(struct usb_ep_descriptor_padded) +                                   \
         sizeof(struct usb_midi_bulk_in_ep_descriptor))
+
+
+int zmk_usb_send_midi_report(void);
