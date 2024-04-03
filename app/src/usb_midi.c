@@ -2,6 +2,7 @@
 #include <zephyr/usb/usb_device.h>
 #include <zmk/usb_midi.h>
 #include <zmk/usb_midi_packet.h>
+#include <zmk/usb.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -154,7 +155,7 @@ int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
   return 1;
 }
 
-static int zmk_usb_midi_send(uint8_t *cable_number, uint8_t *midi_bytes, size_t len) {
+static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t len) {
 
   // prepare the packet
 	struct usb_midi_packet_t packet;

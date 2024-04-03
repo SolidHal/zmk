@@ -77,6 +77,6 @@ int zmk_midi_keys_release(zmk_midi_key_flags_t keys) {
 void zmk_midi_clear(void) { memset(&midi_report.body, 0, sizeof(midi_report.body)); }
 
 
-struct zmk_midi_report *zmk_hid_get_midi_report(void) {
+struct zmk_midi_report *zmk_get_midi_report(void) {
     return &midi_report;
 }
