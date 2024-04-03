@@ -141,9 +141,8 @@ int zmk_endpoints_show() {
     // green led is bit 1
     return zmk_led_show(2);
   }
-#else
-  return 0;
 #endif /* IS_ENABLED(CONFIG_ZMK_BACKLIGHT) */
+  return 0;
 }
 
 int zmk_endpoints_toggle_transport(void) {
