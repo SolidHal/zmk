@@ -15,6 +15,7 @@
 #include <dt-bindings/zmk/hid_usage_pages.h>
 #include <zmk/usb_hid.h>
 #include <zmk/usb_midi.h>
+#include <zmk/midi.h>
 #include <zmk/hog.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/ble_active_profile_changed.h>
@@ -277,10 +278,12 @@ int zmk_endpoints_send_mouse_report() {
 
 #if IS_ENABLED(CONFIG_ZMK_MIDI)
 int zmk_endpoints_send_midi_report() {
+
+    struct zmk_midi_report *midi_report = zmk_get_midi_report();
     switch (current_instance.transport) {
     case ZMK_TRANSPORT_USB: {
 #if IS_ENABLED(CONFIG_ZMK_USB)
-        int err = zmk_usb_send_midi_report();
+        int err = zmk_usb_send_midi_report(&midi_report->body);
         if (err) {
             LOG_ERR("FAILED TO SEND OVER USB: %d", err);
         }

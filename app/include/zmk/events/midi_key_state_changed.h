@@ -21,16 +21,14 @@ ZMK_EVENT_DECLARE(zmk_midi_key_state_changed);
 static inline struct zmk_midi_key_state_changed
 zmk_midi_key_state_changed_from_encoded(uint32_t encoded, bool pressed, int64_t timestamp) {
 
-/* #define ZMK_HID_USAGE_ID(usage) (usage & 0xFFFF) */
-    // TODO any downside to re-using the HID encoding here?
-    uint16_t id = ZMK_HID_USAGE_ID(encoded);
+    uint16_t id = ZMK_MIDI_ID(encoded);
 
     return (struct zmk_midi_key_state_changed){.key = id,
                                               .state = pressed,
                                               .timestamp = timestamp};
 }
 
-static inline int raise_zmk_keycode_state_changed_from_encoded(uint32_t encoded, bool pressed,
+static inline int raise_zmk_midi_key_state_changed_from_encoded(uint32_t encoded, bool pressed,
                                                                int64_t timestamp) {
     return raise_zmk_midi_key_state_changed(
         zmk_midi_key_state_changed_from_encoded(encoded, pressed, timestamp));

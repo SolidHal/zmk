@@ -80,5 +80,3 @@ enum usb_midi_error_t usb_midi_packet_from_midi_bytes(uint8_t *midi_bytes, uint8
 						      struct usb_midi_packet_t *packet);
 enum usb_midi_error_t usb_midi_packet_from_usb_bytes(uint8_t *packet_bytes,
 						     struct usb_midi_packet_t *packet);
-
-#endif

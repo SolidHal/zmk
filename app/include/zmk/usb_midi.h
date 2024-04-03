@@ -1,14 +1,15 @@
 #pragma once
 
 #include <zephyr/usb/usb_device.h>
+#include <zmk/midi.h>
 
 //TODO can add this back as a config option, but for now hardcode it
 #define USB_MIDI_NUM_INPUTS 1
 #define USB_MIDI_NUM_OUTPUTS 1
 
 // 0x00, 0x01, and 0x80 seem to be commonly used. arbitrarily pick endpoints that hopefully aren't used
-#define USB_MIDI_EP_OUT = 0x02
-#define USB_MIDI_EP_IN  = 0x82
+#define USB_MIDI_EP_OUT  0x02
+#define USB_MIDI_EP_IN   0x82
 
 /* Require at least one jack */
 BUILD_ASSERT((USB_MIDI_NUM_INPUTS + USB_MIDI_NUM_OUTPUTS > 0), "USB MIDI device must have more than 0 jacks");
@@ -367,4 +368,4 @@ struct usb_midi_config {
         sizeof(struct usb_midi_bulk_in_ep_descriptor))
 
 
-int zmk_usb_send_midi_report(void);
+int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body);

@@ -4,12 +4,21 @@
  * SPDX-License-Identifier: MIT
  */
 
-//TODO this was kept simple and just uses the mouse logic, eventually we will need to make this more complicated
+#include "zmk/midi.h"
+#include <zephyr/logging/log.h>
+LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
+#include <dt-bindings/zmk/modifiers.h>
+
+// TODO this was kept simple and just uses the mouse logic from hid.c, eventually we will need to make this more complicated
+
+
+static struct zmk_midi_report midi_report = {.report_id = ZMK_REPORT_ID_MIDI,
+  .body = {.keys = 0}};
 
 // Keep track of how often a key was pressed.
 // Only release the key if the count is 0.
 static int explicit_key_counts[5] = {0, 0, 0, 0, 0};
-static zmk_mod_flags_t explicit_keys = 0;
+static zmk_midi_mod_flags_t explicit_keys = 0;
 
 #define SET_MIDI_KEYS(btns)                                                                    \
     {                                                                                              \

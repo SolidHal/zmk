@@ -1,13 +1,14 @@
 
 #include <zephyr/usb/usb_device.h>
-#include <zephyr/usb/usb_midi.h>
+#include <zmk/usb_midi.h>
+#include <zmk/usb_midi_packet.h>
 
+#include <zephyr/logging/log.h>
+LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static K_SEM_DEFINE(midi_sem, 1, 1);
 
 static int usb_midi_is_available = false;
-static void in_ready_cb(const struct device *dev) { k_sem_give(&midi_sem); }
-
 
 // TODO do we need this???
 /*
@@ -31,7 +32,8 @@ struct usb_midi_config usb_midi_config_data = {
 	.in_ep = INIT_IN_EP,
 	.in_cs_ep = {.bLength = sizeof(struct usb_midi_bulk_in_ep_descriptor), .bDescriptorType = USB_DESC_CS_ENDPOINT, .bDescriptorSubtype = 0x01, .bNumEmbMIDIJack = USB_MIDI_NUM_OUTPUTS, .BaAssocJackID = {LISTIFY(USB_MIDI_NUM_OUTPUTS, IDX_WITH_OFFSET, (, ), 1)}},
 	.out_ep = INIT_OUT_EP,
-	.out_cs_ep = {.bLength = sizeof(struct usb_midi_bulk_out_ep_descriptor), .bDescriptorType = USB_DESC_CS_ENDPOINT, .bDescriptorSubtype = 0x01, .bNumEmbMIDIJack = USB_MIDI_NUM_INPUTS, .BaAssocJackID = {LISTIFY(USB_MIDI_NUM_INPUTS, IDX_WITH_OFFSET, (, ), 1 + USB_MIDI_NUM_OUTPUTS)}}};
+	.out_cs_ep = {.bLength = sizeof(struct usb_midi_bulk_out_ep_descriptor), .bDescriptorType = USB_DESC_CS_ENDPOINT, .bDescriptorSubtype = 0x01, .bNumEmbMIDIJack = USB_MIDI_NUM_INPUTS, .BaAssocJackID = {LISTIFY(USB_MIDI_NUM_INPUTS, IDX_WITH_OFFSET, (, ), 1 + USB_MIDI_NUM_OUTPUTS)}}
+};
 
 
 void usb_status_callback(struct usb_cfg_data *cfg,
@@ -96,6 +98,18 @@ void usb_status_callback(struct usb_cfg_data *cfg,
 }
 
 
+
+static void midi_out_ep_cb(uint8_t ep, enum usb_dc_ep_cb_status_code
+										   ep_status)
+{
+  LOG_DBG("midi_out_ep_cb is not implemented");
+}
+
+static void midi_in_ep_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status)
+{
+  LOG_DBG("midi_in_ep_cb is not implemented");
+}
+
 static struct usb_ep_cfg_data midi_ep_cfg[] = {
 	{
 		.ep_cb = midi_in_ep_cb,
@@ -131,32 +145,16 @@ USBD_DEFINE_CFG_DATA(usb_midi_config) = {
 };
 
 
-static int zmk_usb_midi_init(void) {
-  hid_dev = device_get_binding("HID_0");
-  if (hid_dev == NULL) {
-    LOG_ERR("Unable to locate HID device");
-    return -EINVAL;
-  }
-
-  usb_hid_register_device(hid_dev, zmk_hid_report_desc, sizeof(zmk_hid_report_desc), &ops);
-
-#if IS_ENABLED(CONFIG_ZMK_USB_BOOT)
-  usb_hid_set_proto_code(hid_dev, HID_BOOT_IFACE_CODE_KEYBOARD);
-#endif /* IS_ENABLED(CONFIG_ZMK_USB_BOOT) */
-
-  usb_hid_init(hid_dev);
-
-  return 0;
-}
-
-int zmk_usb_send_midi_report(void){
+int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
   //TODO implement like zmk_usb_hid_send_mouse_report() and related?
   LOG_ERR("not implemented");
+
+  //TODO take the zmk_midi_key_report_body pointer, read out the set keys from the bitmap and
+  // call zmk_usb_hid_send on them
   return 1;
 }
 
-// TODO something needs to call this
-static int zmk_usb_hid_send(uint8_t *cable_number, uint8_t *midi_bytes, size_t len) {
+static int zmk_usb_midi_send(uint8_t *cable_number, uint8_t *midi_bytes, size_t len) {
 
   // prepare the packet
 	struct usb_midi_packet_t packet;
@@ -178,13 +176,18 @@ static int zmk_usb_hid_send(uint8_t *cable_number, uint8_t *midi_bytes, size_t l
     return -ENODEV;
   default:
     k_sem_take(&midi_sem, K_MSEC(30));
-    int err = hid_int_ep_write(hid_dev, report, len, NULL);
+    uint32_t num_written_bytes = 0;
     usb_write(USB_MIDI_EP_IN, packet.bytes, 4, &num_written_bytes);
 
-    if (err) {
-      k_sem_give(&hid_sem);
-    }
 
-    return err;
+    // TODO error if num_written_bytes != 4, make sure to release sem on error like usb_hid.c
+
+    // TODO usb_hid.c holds the sem until its in_ready_cb is hit. do we have something like this?
+    // usb status seems to be different, perhaps that is using hid status?
+    // anyway, for now just release the sem right after we transmit
+
+    k_sem_give(&midi_sem);
+
+    return 0;
   }
 }

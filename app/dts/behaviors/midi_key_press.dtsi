@@ -1,0 +1,8 @@
+/ {
+    behaviors {
+        /omit-if-no-ref/ midi: midi_key_press {
+            compatible = "zmk,behavior-midi-key-press";
+            #binding-cells = <1>;
+        };
+    };
+};
