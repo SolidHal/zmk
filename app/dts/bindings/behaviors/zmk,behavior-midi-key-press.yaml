@@ -1,0 +1,5 @@
+description: Midi key press/release behavior
+
+compatible: "zmk,behavior-midi-key-press"
+
+include: one_param.yaml

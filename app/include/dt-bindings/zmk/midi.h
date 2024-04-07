@@ -14,10 +14,10 @@
 // want to communicate:
 // octave + musical key pressed
 
-#define NOTE_C (0x01)
-#define NOTE_D (0x02)
-#define NOTE_E (0x03)
-#define NOTE_F (0x04)
-#define NOTE_G (0x05)
-#define NOTE_A (0x06)
-#define NOTE_B (0x07)
+#define NOTE_C BIT(0)
+#define NOTE_D BIT(1)
+#define NOTE_E BIT(2)
+#define NOTE_F BIT(3)
+#define NOTE_G BIT(4)
+#define NOTE_A BIT(5)
+#define NOTE_B BIT(6)
