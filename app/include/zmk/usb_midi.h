@@ -2,17 +2,23 @@
 
 #include <zephyr/usb/usb_device.h>
 #include <zmk/midi.h>
+#include <usb_descriptor.h>
 
 //TODO can add this back as a config option, but for now hardcode it
 #define USB_MIDI_NUM_INPUTS 1
 #define USB_MIDI_NUM_OUTPUTS 1
 
-// 0x00, 0x01, and 0x80 seem to be commonly used. arbitrarily pick endpoints that hopefully aren't used
-#define USB_MIDI_EP_OUT  0x02
-#define USB_MIDI_EP_IN   0x82
-
 #define USB_MIDI_DEFAULT_CABLE_NUM 0
 #define USB_MIDI_MAX_NUM_BYTES 3
+
+// TODO: these are hardcoded here for usb_write, but bEndpointAddress actually get assigned automatically in the usb configs
+// hard coding them in the usb configs doesn't seem to help, so we don't have a good way of ensuring that
+// the endpoint addresses defined here actually match what zephyr gives our endpoints
+// you can see what the endpoint addresses are by doing "cat /sys/kernel/debug/usb/devices" when the device is plugged in
+// eventually we should find a way to get this information back out of the usb device configuration
+#define ZMK_USB_MIDI_EP_IN 0x81
+#define ZMK_USB_MIDI_EP_OUT 0x01
+
 
 /* Require at least one jack */
 BUILD_ASSERT((USB_MIDI_NUM_INPUTS + USB_MIDI_NUM_OUTPUTS > 0), "USB MIDI device must have more than 0 jacks");
@@ -317,7 +323,7 @@ struct usb_midi_config {
     {                                                       \
         .bLength = sizeof(struct usb_ep_descriptor_padded), \
         .bDescriptorType = USB_DESC_ENDPOINT,               \
-        .bEndpointAddress = USB_MIDI_EP_OUT,               \
+        .bEndpointAddress = ZMK_USB_MIDI_EP_OUT,                    \
         .bmAttributes = 0x02,                               \
         .wMaxPacketSize = 0x0040,                           \
         .bInterval = 0x00,                                  \
@@ -330,7 +336,7 @@ struct usb_midi_config {
     {                                                       \
         .bLength = sizeof(struct usb_ep_descriptor_padded), \
         .bDescriptorType = USB_DESC_ENDPOINT,               \
-        .bEndpointAddress = USB_MIDI_EP_IN,               \
+        .bEndpointAddress = ZMK_USB_MIDI_EP_IN,                     \
         .bmAttributes = 0x02,                               \
         .wMaxPacketSize = 0x0040,                           \
         .bInterval = 0x00,                                  \

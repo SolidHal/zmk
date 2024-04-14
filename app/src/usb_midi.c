@@ -114,11 +114,11 @@ static void midi_in_ep_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 static struct usb_ep_cfg_data midi_ep_cfg[] = {
 	{
 		.ep_cb = midi_in_ep_cb,
-		.ep_addr = USB_MIDI_EP_IN,
+		.ep_addr = ZMK_USB_MIDI_EP_IN,
 	},
 	{
 		.ep_cb = midi_out_ep_cb,
-		.ep_addr = USB_MIDI_EP_OUT,
+		.ep_addr = ZMK_USB_MIDI_EP_OUT,
 	}};
 
 
@@ -173,6 +173,7 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
       return -EINVAL;
     }
 
+  LOG_INF("Sending midi packet %02x %02x %02x %02x to endpoint %02x", packet.bytes[0], packet.bytes[1], packet.bytes[2], packet.bytes[3], ZMK_USB_MIDI_EP_IN);
 
   // ensure usb is ready
   switch (zmk_usb_get_status()) {
@@ -187,8 +188,11 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
     k_sem_take(&midi_sem, K_MSEC(30));
     LOG_INF("doing midi usb_write");
     uint32_t num_written_bytes = 0;
-    usb_write(USB_MIDI_EP_IN, packet.bytes, 4, &num_written_bytes);
-    LOG_INF("completed midi usb write");
+    int ret = usb_write(ZMK_USB_MIDI_EP_IN, packet.bytes, 4, &num_written_bytes);
+    if (ret < 0){
+      LOG_INF("usb_midi usb write error %d", ret);
+    }
+    LOG_INF("completed midi usb write %d", ret);
 
 
     // TODO error if num_written_bytes != 4, make sure to release sem on error like usb_hid.c
@@ -211,14 +215,14 @@ int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
   uint8_t midi_bytes[USB_MIDI_MAX_NUM_BYTES];
 
   if (body->keys > 0) {
-    midi_bytes[0] = 0x90;
+    midi_bytes[0] = 0x90; // key on
   }
   else {
-    midi_bytes[0] = 0x80;
+    midi_bytes[0] = 0x80; // key off
   }
 
-  midi_bytes[1] = 69;
-  midi_bytes[2] = 0x75;
+  midi_bytes[1] = 0x56; // the note
+  midi_bytes[2] = 0x7F; // velocity
 
   //TODO take the zmk_midi_key_report_body pointer, read out the set keys from the bitmap and
   // call zmk_usb_hid_send on them
