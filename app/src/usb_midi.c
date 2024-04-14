@@ -18,7 +18,7 @@ static int usb_midi_is_available = false;
  *  #define USBD_CLASS_DESCR_DEFINE(p, instance)                         \
  *          static __in_section(usb, descriptor_##p.1, instance) __used __aligned(1)
  */
-USBD_CLASS_DESCR_DEFINE(primary, 1)
+USBD_CLASS_DESCR_DEFINE(primary, 0)
 
 
 struct usb_midi_config usb_midi_config_data = {
@@ -122,6 +122,21 @@ static struct usb_ep_cfg_data midi_ep_cfg[] = {
 	}};
 
 
+
+static void midi_interface_config(struct usb_desc_header *head,
+                                 uint8_t bInterfaceNumber)
+{
+	struct usb_if_descriptor *if_desc = (struct usb_if_descriptor *) head;
+	struct usb_midi_config *desc =
+		CONTAINER_OF(if_desc, struct usb_midi_config, ac_if);
+
+	desc->ac_if.bInterfaceNumber = bInterfaceNumber;
+	desc->ms_if.bInterfaceNumber = bInterfaceNumber + 1;
+
+	/* desc->if0_union.bControlInterface = bInterfaceNumber; */
+}
+
+
 //TODO this is the macro that sets up the usb device for midi
 // will this fight the one defined by zephyr usb_hid.c
 /*
@@ -133,7 +148,7 @@ static struct usb_ep_cfg_data midi_ep_cfg[] = {
 
 USBD_DEFINE_CFG_DATA(usb_midi_config) = {
 	.usb_device_description = NULL,
-	.interface_config = NULL,
+	.interface_config = midi_interface_config,
 	.interface_descriptor = &usb_midi_config_data.ac_if,
 	.cb_usb_status = usb_status_callback,
 	.interface = {
@@ -146,17 +161,9 @@ USBD_DEFINE_CFG_DATA(usb_midi_config) = {
 };
 
 
-int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
-  //TODO implement like zmk_usb_hid_send_mouse_report() and related?
-  LOG_ERR("not implemented");
-
-  //TODO take the zmk_midi_key_report_body pointer, read out the set keys from the bitmap and
-  // call zmk_usb_hid_send on them
-  return 1;
-}
-
 static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t len) {
 
+  LOG_INF("Sending midi byes %02x %02x %02x", midi_bytes[0], midi_bytes[1], midi_bytes[2]);
   // prepare the packet
 	struct usb_midi_packet_t packet;
 	enum usb_midi_error_t error = usb_midi_packet_from_midi_bytes(midi_bytes, cable_number, &packet);
@@ -165,6 +172,7 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
       LOG_ERR("Building packet from MIDI bytes %02x %02x %02x failed with error %d", midi_bytes[0], midi_bytes[1], midi_bytes[2], error);
       return -EINVAL;
     }
+
 
   // ensure usb is ready
   switch (zmk_usb_get_status()) {
@@ -177,8 +185,10 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
     return -ENODEV;
   default:
     k_sem_take(&midi_sem, K_MSEC(30));
+    LOG_INF("doing midi usb_write");
     uint32_t num_written_bytes = 0;
     usb_write(USB_MIDI_EP_IN, packet.bytes, 4, &num_written_bytes);
+    LOG_INF("completed midi usb write");
 
 
     // TODO error if num_written_bytes != 4, make sure to release sem on error like usb_hid.c
@@ -191,4 +201,26 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
 
     return 0;
   }
+}
+
+
+
+int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
+  //TODO implement like zmk_usb_hid_send_mouse_report() and related?
+
+  uint8_t midi_bytes[USB_MIDI_MAX_NUM_BYTES];
+
+  if (body->keys > 0) {
+    midi_bytes[0] = 0x90;
+  }
+  else {
+    midi_bytes[0] = 0x80;
+  }
+
+  midi_bytes[1] = 69;
+  midi_bytes[2] = 0x75;
+
+  //TODO take the zmk_midi_key_report_body pointer, read out the set keys from the bitmap and
+  // call zmk_usb_hid_send on them
+  return zmk_usb_midi_send(USB_MIDI_DEFAULT_CABLE_NUM, midi_bytes, USB_MIDI_MAX_NUM_BYTES);
 }

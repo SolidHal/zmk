@@ -11,6 +11,9 @@
 #define USB_MIDI_EP_OUT  0x02
 #define USB_MIDI_EP_IN   0x82
 
+#define USB_MIDI_DEFAULT_CABLE_NUM 0
+#define USB_MIDI_MAX_NUM_BYTES 3
+
 /* Require at least one jack */
 BUILD_ASSERT((USB_MIDI_NUM_INPUTS + USB_MIDI_NUM_OUTPUTS > 0), "USB MIDI device must have more than 0 jacks");
 
