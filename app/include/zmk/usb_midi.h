@@ -11,6 +11,7 @@
 #define USB_MIDI_DEFAULT_CABLE_NUM 0
 #define USB_MIDI_MAX_NUM_BYTES 3
 
+
 // TODO: these are hardcoded here for usb_write, but bEndpointAddress actually get assigned automatically in the usb configs
 // hard coding them in the usb configs doesn't seem to help, so we don't have a good way of ensuring that
 // the endpoint addresses defined here actually match what zephyr gives our endpoints

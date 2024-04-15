@@ -11,7 +11,7 @@
 #include <zmk/midi.h>
 
 struct zmk_midi_key_state_changed {
-    uint32_t key;
+    zmk_midi_key_t key;
     bool state;
     int64_t timestamp;
 };

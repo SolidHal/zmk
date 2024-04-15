@@ -210,21 +210,25 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
 
 
 int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
-  //TODO implement like zmk_usb_hid_send_mouse_report() and related?
-
   uint8_t midi_bytes[USB_MIDI_MAX_NUM_BYTES];
 
-  if (body->keys > 0) {
-    midi_bytes[0] = 0x90; // key on
+  LOG_INF("body note key = %d, pressed = %d", body->note_key, body->pressed);
+
+  if (body->note_key > 0 && body->note_key < MIDI_INVALID){
+    if (body->pressed) {
+      midi_bytes[0] = 0x90; // note key on
+    }
+    else {
+      midi_bytes[0] = 0x80; // note key off
+    }
+    midi_bytes[1] = body->note_key; // the note
+    midi_bytes[2] = ZMK_MIDI_MAX_VELOCITY;
+
   }
-  else {
-    midi_bytes[0] = 0x80; // key off
+  else if (body->control_key > 0 && body->control_key < MIDI_INVALID){
+    LOG_INF("midi control handling not implemented in usb_midi.c");
+    return 0;
   }
 
-  midi_bytes[1] = 0x56; // the note
-  midi_bytes[2] = 0x7F; // velocity
-
-  //TODO take the zmk_midi_key_report_body pointer, read out the set keys from the bitmap and
-  // call zmk_usb_hid_send on them
   return zmk_usb_midi_send(USB_MIDI_DEFAULT_CABLE_NUM, midi_bytes, USB_MIDI_MAX_NUM_BYTES);
 }
