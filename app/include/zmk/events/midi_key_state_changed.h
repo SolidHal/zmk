@@ -21,7 +21,8 @@ ZMK_EVENT_DECLARE(zmk_midi_key_state_changed);
 static inline struct zmk_midi_key_state_changed
 zmk_midi_key_state_changed_from_encoded(uint32_t encoded, bool pressed, int64_t timestamp) {
 
-    uint16_t id = ZMK_MIDI_ID(encoded);
+    // no decoding necessary
+    zmk_midi_key_t id = encoded;
 
     return (struct zmk_midi_key_state_changed){.key = id,
                                               .state = pressed,

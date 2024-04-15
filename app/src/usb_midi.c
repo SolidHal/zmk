@@ -163,7 +163,7 @@ USBD_DEFINE_CFG_DATA(usb_midi_config) = {
 
 static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t len) {
 
-  LOG_INF("Sending midi byes %02x %02x %02x", midi_bytes[0], midi_bytes[1], midi_bytes[2]);
+  LOG_INF("Sending midi bytes %02x %02x %02x", midi_bytes[0], midi_bytes[1], midi_bytes[2]);
   // prepare the packet
 	struct usb_midi_packet_t packet;
 	enum usb_midi_error_t error = usb_midi_packet_from_midi_bytes(midi_bytes, cable_number, &packet);

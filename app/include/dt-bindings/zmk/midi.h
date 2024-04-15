@@ -7,8 +7,9 @@
 
 #include <zephyr/dt-bindings/dt-util.h>
 
-// borrowed  from ZMK_HID_USAGE_ID in hid_usage_pages.h
-#define ZMK_MIDI_ID(usage) (usage & 0xFFFF)
+
+//NOTE MIDI octave index is +2 vs "normal" octave index
+// so standard C3 is MIDI C5 here
 
 // All NOTE_* have the identical keycode and midi code
 #define NOTE_C 0x0

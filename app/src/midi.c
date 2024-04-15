@@ -40,29 +40,48 @@ static zmk_midi_keys_t pressed_control_keys = 0;
 static int octave_shift = 0;
 
 
-int zmk_midi_key_press(zmk_midi_key_t key) {
-  LOG_INF("zmk_midi_key_press received: %04x", key);
+void set_bitmap(uint64_t map, uint32_t bit_num, bool value){
+  // do this in a function as WRITE_BIT
+  // dirties the value in bitnum
+  WRITE_BIT(map, bit_num, value);
+}
+
+bool bit_is_set(uint64_t map, uint32_t bit_num){
+  // The BIT macro modifies the value, so using it outside of a function
+  // can dirty the bit_num variable
+  return (map & BIT(bit_num));
+}
+
+int zmk_midi_key_press(const zmk_midi_key_t key) {
+
+  LOG_INF("zmk_midi_key_press received: 0x%04x aka %d", key, key);
+
   switch(key) {
   case MIDI_MIN_NOTE ... MIDI_MAX_NOTE:
-        if (pressed_note_keys & BIT(key)){
-          if (multipressed_note_keys & BIT(key)){
-            // nothing to do, we don't track further presses
-            return 0;
-          }
-          else{
-            // no report to send, but we do need to update our multipress tracking
-            WRITE_BIT(multipressed_note_keys, key, true);
-            return 0;
-          }
-        }
-        else{
+        LOG_INF("zmk_midi_key_press: have a note key: pressed_note_keys = %lld, key = %d", pressed_note_keys, key);
+        /* if (bit_is_set(pressed_note_keys, key)) { */
+        /*   if (bit_is_set(multipressed_note_keys, key)) { */
+        /*     // nothing to do, we don't track further presses */
+        /*     return 0; */
+        /*   } */
+        /*   else{ */
+        /*     // no report to send, but we do need to update our multipress tracking */
+        /*     set_bitmap(multipressed_note_keys, key, true); */
+        /*     return 0; */
+        /*   } */
+        /* } */
+        /* else{ */
           // new note pressed, update tracking
-          WRITE_BIT(pressed_note_keys, key, true);
+          //TODO for some reason this bitmap isn't working properly.
+          // debug
+          /* LOG_INF("zmk_midi_key_press: pre set_bitmap: pressed_note_keys = %lld, key = %d", pressed_note_keys, key); */
+          /* set_bitmap(pressed_note_keys, key, true); */
+          /* LOG_INF("zmk_midi_key_press: post set_bitmap: pressed_note_keys = %lld, key = %d", pressed_note_keys, key); */
           // and write and updated report
           midi_report.body.note_key = key;
           midi_report.body.control_key = MIDI_INVALID;
           midi_report.body.pressed = true; 
-        }
+        /* } */
         break;
   case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
         // not implemented
@@ -80,32 +99,37 @@ int zmk_midi_key_press(zmk_midi_key_t key) {
     return 0;
 }
 
-int zmk_midi_key_release(zmk_midi_key_t key) {
+int zmk_midi_key_release(const zmk_midi_key_t key) {
+  LOG_INF("zmk_midi_key_release received: 0x%04x aka %d", key, key);
+  LOG_INF("zmk_midi_key_release, pressed_note_keys = %lld", pressed_note_keys);
+
   switch(key) {
   case MIDI_MIN_NOTE ... MIDI_MAX_NOTE:
-    if (pressed_note_keys & BIT(key)){
-      if (multipressed_note_keys & BIT(key)){
-        // no longer multipressed
-        WRITE_BIT(multipressed_note_keys, key, false);
-        return 0;
-      }
-      else{
+    /* if (bit_is_set(pressed_note_keys, key)){ */
+    /*   if (bit_is_set(multipressed_note_keys, key)){ */
+    /*     // no longer multipressed */
+    /*     set_bitmap(multipressed_note_keys, key, false); */
+    /*     return 0; */
+    /*   } */
+    /*   else{ */
+    /*     LOG_INF("zmk_midi_key_release: releasing key"); */
         // no longer pressed
         // update tracking
-        WRITE_BIT(pressed_note_keys, key, false);
+        /* set_bitmap(pressed_note_keys, key, false); */
         // write an updated report
         midi_report.body.note_key = key;
         midi_report.body.control_key = MIDI_INVALID;
         midi_report.body.pressed = false; 
         return 0;
-      }
-    }
-    else{
-      // key that is no longer pressed was released
-      // this should only happen when there are 3+ physical keys mapped to a single note
-      // nothing to do
-      return 0;
-    }
+    /*   } */
+    /* } */
+    /* else{ */
+    /*   // key that is no longer pressed was released */
+    /*   // this should only happen when there are 3+ physical keys mapped to a single note */
+    /*   // nothing to do */
+    /*   LOG_INF("zmk_midi_key_release: 3rd release ignored"); */
+    /*   return 0; */
+    /* } */
     break;
   case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
     // not implemented

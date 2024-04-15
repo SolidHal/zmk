@@ -33,3 +33,4 @@ void zmk_midi_clear(void);
 
 // Analogous to zmk_hid_get_mouse_report in hid.h
 struct zmk_midi_report *zmk_get_midi_report();
+
