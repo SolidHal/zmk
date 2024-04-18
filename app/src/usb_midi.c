@@ -11,13 +11,8 @@ static K_SEM_DEFINE(midi_sem, 1, 1);
 
 static int usb_midi_is_available = false;
 
-// TODO do we need this???
-/*
- * These macros should be used to place the USB descriptors
- * in predetermined order in the RAM.
- *  #define USBD_CLASS_DESCR_DEFINE(p, instance)                         \
- *          static __in_section(usb, descriptor_##p.1, instance) __used __aligned(1)
- */
+// This macros should be used to place the USB descriptors
+// in predetermined order in the RAM.
 USBD_CLASS_DESCR_DEFINE(primary, 0)
 
 
@@ -133,19 +128,10 @@ static void midi_interface_config(struct usb_desc_header *head,
 	desc->ac_if.bInterfaceNumber = bInterfaceNumber;
 	desc->ms_if.bInterfaceNumber = bInterfaceNumber + 1;
 
-	/* desc->if0_union.bControlInterface = bInterfaceNumber; */
 }
 
 
-//TODO this is the macro that sets up the usb device for midi
-// will this fight the one defined by zephyr usb_hid.c
-/*
- * This macro should be used to place the struct usb_cfg_data
- * inside usb data section in the RAM.
- * #define USBD_DEFINE_CFG_DATA(name)               \
- * static STRUCT_SECTION_ITERABLE(usb_cfg_data, name)
- */
-
+// this is the macro that sets up the usb device for midi
 USBD_DEFINE_CFG_DATA(usb_midi_config) = {
 	.usb_device_description = NULL,
 	.interface_config = midi_interface_config,
@@ -217,12 +203,13 @@ int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
   if (body->note_key > 0 && body->note_key < MIDI_INVALID){
     if (body->pressed) {
       midi_bytes[0] = 0x90; // note key on
+      midi_bytes[2] = ZMK_MIDI_ON_VELOCITY;
     }
     else {
       midi_bytes[0] = 0x80; // note key off
+      midi_bytes[2] = ZMK_MIDI_OFF_VELOCITY;
     }
     midi_bytes[1] = body->note_key; // the note
-    midi_bytes[2] = ZMK_MIDI_MAX_VELOCITY;
 
   }
   else if (body->control_key > 0 && body->control_key < MIDI_INVALID){

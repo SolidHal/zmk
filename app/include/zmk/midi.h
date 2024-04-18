@@ -11,6 +11,8 @@
 #define ZMK_REPORT_ID_MIDI 0x04
 
 #define ZMK_MIDI_MAX_VELOCITY 0x7F
+#define ZMK_MIDI_ON_VELOCITY 0x3F
+#define ZMK_MIDI_OFF_VELOCITY 0x64
 
 // Analogous to zmk_hid_mouse_report_body in hid.h
 struct zmk_midi_key_report_body {
