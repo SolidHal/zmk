@@ -3,22 +3,29 @@
 #include <zmk/midi_keys.h>
 
 
-// TODO, instead of using this we should use something like the TOGGLE_KEYBOARD macro
 // in hid.c
 #define ZMK_MIDI_NUM_KEYS 0x100
 
 // should come after the last ZMK_HID_REPORT_ID in hid.h
 #define ZMK_REPORT_ID_MIDI 0x04
 
+#define ZMK_MIDI_CIN_NOTE_ON 0x90
+#define ZMK_MIDI_CIN_NOTE_OFF 0x80
+#define ZMK_MIDI_CIN_CONTROL_CHANGE 0xB0
+#define ZMK_MIDI_CIN_PITCH_BEND_CHANGE 0xE0
+
 #define ZMK_MIDI_MAX_VELOCITY 0x7F
 #define ZMK_MIDI_ON_VELOCITY 0x3F
 #define ZMK_MIDI_OFF_VELOCITY 0x64
 
+#define ZMK_MIDI_TOGGLE_ON 0x7F
+#define ZMK_MIDI_TOGGLE_OFF 0x0
+
 // Analogous to zmk_hid_mouse_report_body in hid.h
 struct zmk_midi_key_report_body {
-  zmk_midi_note_key_t note_key;
-  zmk_midi_control_key_t control_key;
-  bool pressed;
+  zmk_midi_cin_t cin;
+  zmk_midi_key_t key;
+  zmk_midi_value_t key_value;
 } __packed;
 
 // Analogous to zmk_hid_mouse_report in hid.h

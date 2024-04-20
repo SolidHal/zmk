@@ -11,14 +11,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 
 static struct zmk_midi_report midi_report = {.report_id = ZMK_REPORT_ID_MIDI,
-  .body = {.note_key = MIDI_INVALID, .control_key = MIDI_INVALID, .pressed = false}};
+  .body = {.cin = MIDI_INVALID, .key = MIDI_INVALID, .key_value = MIDI_INVALID}};
 
-
-static zmk_midi_keys_t pressed_control_keys = 0;
-
-// number of octaves to shift a keycode up/down
-static int octave_shift = 0;
-
+static bool sustain_toggle_on = false;
+static bool sostenuto_toggle_on = false;
 
 void set_bitmap(uint64_t map, uint32_t bit_num, bool value){
   // do this in a function as WRITE_BIT
@@ -32,25 +28,42 @@ bool bit_is_set(uint64_t map, uint32_t bit_num){
   return (map & BIT(bit_num));
 }
 
-int zmk_midi_key_press(const zmk_midi_key_t key) {
+void zmk_midi_report_clear(){
+  midi_report.body.cin = MIDI_INVALID;
+  midi_report.body.key = MIDI_INVALID;
+  midi_report.body.key_value = MIDI_INVALID;
+}
 
+int zmk_midi_key_press(const zmk_midi_key_t key) {
   LOG_INF("zmk_midi_key_press received: 0x%04x aka %d", key, key);
 
   switch(key) {
   case MIDI_MIN_NOTE ... MIDI_MAX_NOTE:
           // and write and updated report
-          midi_report.body.note_key = key;
-          midi_report.body.control_key = MIDI_INVALID;
-          midi_report.body.pressed = true; 
-        /* } */
+          zmk_midi_report_clear();
+          midi_report.body.cin = ZMK_MIDI_CIN_NOTE_ON;
+          midi_report.body.key = key;
+          midi_report.body.key_value = ZMK_MIDI_ON_VELOCITY;
         break;
   case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
-        // not implemented
-        // make sure to reset the note key when we do implement this
-        midi_report.body.note_key = MIDI_INVALID;
-        LOG_INF("midi control handling not implemented");
+    zmk_midi_key_t control_key_transformed = (uint8_t) key;
+        if (SUSTAIN == key){
+          if(!sustain_toggle_on){
+            sustain_toggle_on = true;
+            zmk_midi_report_clear();
+            midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+            midi_report.body.key = control_key_transformed;
+            midi_report.body.key_value = ZMK_MIDI_TOGGLE_ON;
+          }
+        }
+        else{
+          // not implemented
+          zmk_midi_report_clear();
+          LOG_INF("midi control handling not implemented");
+        }
         return 0;
-      default:
+        break;
+   default:
         LOG_ERR("Unsupported midi key %d", key);
         return -EINVAL;
       break;
@@ -66,16 +79,28 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
   switch(key) {
   case MIDI_MIN_NOTE ... MIDI_MAX_NOTE:
         // write an updated report
-        midi_report.body.note_key = key;
-        midi_report.body.control_key = MIDI_INVALID;
-        midi_report.body.pressed = false; 
+        zmk_midi_report_clear();
+        midi_report.body.cin = ZMK_MIDI_CIN_NOTE_OFF;
+        midi_report.body.key = key;
+        midi_report.body.key_value = ZMK_MIDI_OFF_VELOCITY;
         return 0;
     break;
   case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
-    // not implemented
-    // make sure to reset the note key when we do implement this
-    midi_report.body.note_key = MIDI_INVALID;
-    LOG_INF("midi control handling not implemented");
+    zmk_midi_key_t control_key_transformed = (uint8_t) key;
+    if (SUSTAIN == key){
+      if(sustain_toggle_on){
+        sustain_toggle_on = false;
+        zmk_midi_report_clear();
+        midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+        midi_report.body.key = control_key_transformed;
+        midi_report.body.key_value = ZMK_MIDI_TOGGLE_OFF;
+      }
+    }
+    else{
+      // not implemented
+      zmk_midi_report_clear();
+      LOG_INF("midi control handling not implemented");
+    }
     return 0;
     break;
   default:

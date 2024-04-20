@@ -210,11 +210,14 @@
 #define MIDI_MAX_NOTE NOTE_G_10
 #define MIDI_INVALID 0xFF
 
-// Midi control keycodes
-// appended with 0xFF
-#define OCT_UP 0xFF81
-#define OCT_DOWN 0xFF82
+// Midi control change keycodes
+// appended with 0xB0
+#define SUSTAIN 0xB040
+#define PORTAMENTO 0xB041
+#define SOSTENUTO 0xB042
+#define OCT_UP 0xB081
+#define OCT_DOWN 0xB082
 
 // midi control sentinals
-#define MIDI_MIN_CONTROL OCT_UP
+#define MIDI_MIN_CONTROL SUSTAIN
 #define MIDI_MAX_CONTROL OCT_DOWN

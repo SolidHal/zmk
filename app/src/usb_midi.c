@@ -198,23 +198,17 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
 int zmk_usb_send_midi_report(struct zmk_midi_key_report_body* body){
   uint8_t midi_bytes[USB_MIDI_MAX_NUM_BYTES];
 
-  LOG_INF("body note key = %d, pressed = %d", body->note_key, body->pressed);
+  LOG_INF("body cin = %d, key = %d, key_value = %d", body->cin, body->key, body->key_value);
 
-  if (body->note_key > 0 && body->note_key < MIDI_INVALID){
-    if (body->pressed) {
-      midi_bytes[0] = 0x90; // note key on
-      midi_bytes[2] = ZMK_MIDI_ON_VELOCITY;
-    }
-    else {
-      midi_bytes[0] = 0x80; // note key off
-      midi_bytes[2] = ZMK_MIDI_OFF_VELOCITY;
-    }
-    midi_bytes[1] = body->note_key; // the note
+  if (body->key > 0 && body->key < MIDI_INVALID && body->key_value < MIDI_INVALID){
 
+    midi_bytes[0] = body->cin; // note on, note off, control change, etc
+    midi_bytes[1] = body->key; // the note, control change code, etc
+    midi_bytes[2] = body->key_value; // the velocity, or control change value, etc
   }
-  else if (body->control_key > 0 && body->control_key < MIDI_INVALID){
-    LOG_INF("midi control handling not implemented in usb_midi.c");
-    return 0;
+  else {
+    LOG_ERR("No valid midi key!");
+    return -1;
   }
 
   return zmk_usb_midi_send(USB_MIDI_DEFAULT_CABLE_NUM, midi_bytes, USB_MIDI_MAX_NUM_BYTES);
