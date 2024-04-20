@@ -49,11 +49,34 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
     zmk_midi_key_t control_key_transformed = (uint8_t) key;
         if (SUSTAIN == key){
           if(!sustain_toggle_on){
-            sustain_toggle_on = true;
+            // we set the toggle on in the release
+            // since there will be 2 releases before we want
+            // to turn off the toggle
+            // dont set the toggle on here!
             zmk_midi_report_clear();
             midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
             midi_report.body.key = control_key_transformed;
             midi_report.body.key_value = ZMK_MIDI_TOGGLE_ON;
+          }
+          else{
+            zmk_midi_report_clear();
+            return -EINPROGRESS;
+          }
+        }
+        else if (SOSTENUTO == key){
+          if(!sostenuto_toggle_on){
+            // we set the toggle on in the release
+            // since there will be 2 releases before we want
+            // to turn off the toggle
+            // dont set the toggle on here!
+            zmk_midi_report_clear();
+            midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+            midi_report.body.key = control_key_transformed;
+            midi_report.body.key_value = ZMK_MIDI_TOGGLE_ON;
+          }
+          else{
+            zmk_midi_report_clear();
+            return -EINPROGRESS;
           }
         }
         else{
@@ -88,8 +111,33 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
   case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
     zmk_midi_key_t control_key_transformed = (uint8_t) key;
     if (SUSTAIN == key){
-      if(sustain_toggle_on){
+      if(!sustain_toggle_on){
+        // the first release we see of a toggle we should ignore
+        // otherwise it doesn't behave as a toggle!
+        // just set the toggle variable
+        sustain_toggle_on = true;
+        zmk_midi_report_clear();
+        return -EINPROGRESS;
+      }
+      else if(sustain_toggle_on){
         sustain_toggle_on = false;
+        zmk_midi_report_clear();
+        midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+        midi_report.body.key = control_key_transformed;
+        midi_report.body.key_value = ZMK_MIDI_TOGGLE_OFF;
+      }
+    }
+    else if (SOSTENUTO == key){
+      if(!sostenuto_toggle_on){
+        // the first release we see of a toggle we should ignore
+        // otherwise it doesn't behave as a toggle!
+        // just set the toggle variable
+        sostenuto_toggle_on = true;
+        zmk_midi_report_clear();
+        return -EINPROGRESS;
+      }
+      else if(sostenuto_toggle_on){
+        sostenuto_toggle_on = false;
         zmk_midi_report_clear();
         midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
         midi_report.body.key = control_key_transformed;

@@ -15,13 +15,21 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static void listener_midi_key_pressed(const struct zmk_midi_key_state_changed *ev) {
     LOG_DBG("midi key: 0x%04X", ev->key);
-    zmk_midi_key_press(ev->key);
+    int ret = zmk_midi_key_press(ev->key);
+    if (ret < 0){
+      LOG_DBG("listener_midi_key_pressed received error, ignoring");
+      return;
+    }
     zmk_endpoints_send_midi_report();
 }
 
 static void listener_midi_key_released(const struct zmk_midi_key_state_changed *ev) {
     LOG_DBG("midi key: 0x%04X", ev->key);
-    zmk_midi_key_release(ev->key);
+    int ret = zmk_midi_key_release(ev->key);
+    if (ret < 0){
+      LOG_DBG("listener_midi_key_released received error, ignoring");
+      return;
+    }
     zmk_endpoints_send_midi_report();
 }
 
