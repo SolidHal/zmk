@@ -79,7 +79,7 @@ bindings = <
       &kp Q     &kp D     &kp R     &kp W      &kp B                                               &kp J     &kp F     &kp U     &kp P     &kp SEMI   
       &kp A     &kp S     &kp H     &kp T      &kp G                                               &kp Y     &kp N     &kp E     &kp O     &kp I
       &kp Z    &kp X     &kp M     &kp C      &kp V                                               &kp K     &kp L     &kp COMMA &kp DOT   &kp FSLH
-    &out_td &kp C_VOL_DN &kp C_VOL_UP                                                                                   &alt_tab  &kp DEL   &bt BT_SHO
+    &out_td &kp C_VOL_DN &kp C_VOL_UP                                                                                   &kp LALT  &kp DEL   &bt BT_SHO
                                   &kp LGUI    &kp SPC   &kp ESC                         &kp BSPC  &kp LSHFT  &kp ENTER
                                               &mo NUM_L &kp LCTRL                       &kp TAB   &mo ARROW_L
             >;
@@ -87,10 +87,10 @@ bindings = <
 
         num_layer {
 bindings = <
-      &none   &kp GRAVE &kp MINUS &kp EQUAL   &none                                               &none     &kp N7    &kp N8    &kp N9     &none
-      &none   &kp LBKT  &kp RBKT   &kp BSLH   &none                                               &kp N0    &kp N4    &kp N5    &kp N6     &none
-      &none   &kp SEMI   &kp SQT   &kp FSLH   &none                                               &kp DOT   &kp N1    &kp N2    &kp N3    &none
-      &trans    &trans    &trans                                                                                      &trans   &trans    &trans
+   &bt BT_SEL 0   &kp GRAVE &kp MINUS &kp EQUAL   &none                                               &none     &kp N7    &kp N8    &kp N9     &none
+   &bt BT_SEL 1  &kp LBKT  &kp RBKT   &kp BSLH   &none                                               &kp N0    &kp N4    &kp N5    &kp N6     &none
+   &bt BT_SEL 2  &kp SEMI   &kp SQT   &kp FSLH   &none                                               &kp DOT   &kp N1    &kp N2    &kp N3    &none
+   &bt BT_SEL 3  &trans    &trans                                                                                      &trans   &trans    &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
                                              &trans   &trans                        &trans   &trans
             >;
@@ -100,7 +100,7 @@ bindings = <
 bindings = <
       &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                          &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
     &bootloader  &none  &none   &none   &none                                   &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
-   &none    &none  &none   &none   &none                                           &bt BT_SEL 0  &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3  &bt BT_CLR
+   &bt BT_CLR    &none  &none   &none   &none                                   &kp HOME    &kp END     &kp HOME  &kp END    &none
       &trans    &trans  &trans                                                                                        &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
                                              &trans   &trans                        &trans   &trans
