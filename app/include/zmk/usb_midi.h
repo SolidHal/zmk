@@ -233,11 +233,6 @@ struct usb_midi_config {
 
 
 
-
-
-
-
-
 /* No jack string descriptors by default  */
 #define INPUT_JACK_STRING_DESCR_IDX(jack_idx) 0
 #define OUTPUT_JACK_STRING_DESCR_IDX(jack_idx) 0

@@ -14,8 +14,6 @@ static int usb_midi_is_available = false;
 // This macros should be used to place the USB descriptors
 // in predetermined order in the RAM.
 USBD_CLASS_DESCR_DEFINE(primary, 0)
-
-
 struct usb_midi_config usb_midi_config_data = {
 	.ac_if = INIT_AC_IF,
 	.ac_cs_if = INIT_AC_CS_IF,
