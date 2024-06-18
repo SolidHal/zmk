@@ -1,0 +1,12 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+if ZMK_BACKLIGHT
+
+config PWM
+    default y
+
+config LED_PWM
+    default y
+
+endif # ZMK_BACKLIGHT
