@@ -22,13 +22,6 @@
 / {
 
 
-// TODO need function/macro that shows the current bluetooth device in use
-// also need to modify the BT_SEL funcs so they show the bluetooth device in use for a short period after changing
-
-
-// TODO need to have similar check func/macro for output selection
-// then also when OUT_TOG is pressed, light either blue or green leds
-
 // switch the bt device depending on the number of taps on td0
     behaviors {
         out_td: tap_dance_0 {
