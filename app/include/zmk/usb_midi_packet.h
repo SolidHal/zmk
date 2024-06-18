@@ -62,12 +62,6 @@ struct usb_midi_parse_cb_t {
 	usb_midi_sysex_end_cb_t sysex_end_cb;
 };
 
-/**
- * Parses a USB MIDI packet and invokes the appropriate callback.
- */
-enum usb_midi_error_t usb_midi_parse_packet(uint8_t *packet_bytes,
-					    struct usb_midi_parse_cb_t *parse_cb);
-
 /* A USB MIDI event packet. See chapter 4 in the spec. */
 struct usb_midi_packet_t {
 	uint8_t cable_num;
@@ -78,5 +72,3 @@ struct usb_midi_packet_t {
 
 enum usb_midi_error_t usb_midi_packet_from_midi_bytes(uint8_t *midi_bytes, uint8_t cable_num,
 						      struct usb_midi_packet_t *packet);
-enum usb_midi_error_t usb_midi_packet_from_usb_bytes(uint8_t *packet_bytes,
-						     struct usb_midi_packet_t *packet);
