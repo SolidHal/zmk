@@ -6,7 +6,20 @@ module.exports = {
       "faq",
       "user-setup",
       "customization",
-      "troubleshooting",
+      {
+        type: "category",
+        label: "Troubleshooting",
+        link: {
+          type: "doc",
+          id: "troubleshooting/index",
+        },
+        collapsed: true,
+        items: [
+          "troubleshooting/building-issues",
+          "troubleshooting/flashing-issues",
+          "troubleshooting/connection-issues",
+        ],
+      },
     ],
     Features: [
       "features/keymaps",
@@ -19,9 +32,11 @@ module.exports = {
       "features/underglow",
       "features/backlight",
       "features/battery",
+      "features/soft-off",
       "features/beta-testing",
     ],
     Behaviors: [
+      "behaviors/index",
       "behaviors/key-press",
       "behaviors/layers",
       "behaviors/misc",
@@ -43,6 +58,7 @@ module.exports = {
       "behaviors/underglow",
       "behaviors/backlight",
       "behaviors/power",
+      "behaviors/soft-off",
     ],
     Codes: [
       "codes/index",
@@ -73,7 +89,16 @@ module.exports = {
       "development/clean-room",
       "development/pre-commit",
       "development/documentation",
-      "development/setup",
+      {
+        type: "category",
+        label: "Setup",
+        collapsed: true,
+        items: [
+          "development/setup/index",
+          "development/setup/docker",
+          "development/setup/native",
+        ],
+      },
       "development/build-flash",
       "development/boards-shields-keymaps",
       "development/posix-board",

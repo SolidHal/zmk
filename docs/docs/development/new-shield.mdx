@@ -67,6 +67,10 @@ mkdir boards/shields/<keyboard_name>
 
 ## Base Kconfig Files
 
+:::tip[Example shields]
+You can check out the [`shields` folder](https://github.com/zmkfirmware/zmk/tree/main/app/boards/shields) in the ZMK repo that houses [the in-tree supported shields](../hardware.mdx) in order to copy and modify as a starting point.
+:::
+
 There are two required Kconfig files that need to be created for your new keyboard
 shield to get it picked up for ZMK, `Kconfig.shield` and `Kconfig.defconfig`.
 
@@ -171,6 +175,7 @@ this might look something like:
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-matrix";
         diode-direction = "col2row";
+        wakeup-source;
 
         col-gpios
             = <&pro_micro 15 GPIO_ACTIVE_HIGH>
@@ -228,8 +233,9 @@ RC(3,0) RC(3,1) RC(3,2) RC(3,3) RC(3,4) RC(3,5) RC(4,2) RC(4,9) RC(3,6) RC(3,7) 
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
-
         diode-direction = "col2row";
+        wakeup-source;
+
         row-gpios
             = <&pro_micro 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // Row A from the schematic file
             , <&pro_micro 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // Row B from the schematic file
@@ -343,6 +349,8 @@ Here is an example for the [nice60](https://github.com/Nicell/nice60), which use
         zmk,matrix-transform = &default_transform;
     };
 
+    /* define kscan node with label `kscan0`... */
+
     default_transform: keymap_transform_0 {
         compatible = "zmk,matrix-transform";
         columns = <8>;
@@ -360,6 +368,9 @@ RC(6,0)       RC(6,1) RC(6,2) RC(6,3) RC(5,3) RC(6,4) RC(5,4) RC(6,5) RC(5,5) RC
 RC(7,0)    RC(7,1)   RC(7,2)                     RC(7,3)                    RC(7,5)    RC(7,6)    RC(6,7)    RC(7,7)
         >;
     };
+
+    /* potentially other overlay nodes... */
+};
 ```
 
 Some important things to note:
@@ -386,7 +397,7 @@ The two `#include` lines at the top of the keymap are required in order to bring
 
 ### Keymap Behaviors
 
-For the full documentation on the available behaviors for use in keymaps, start with reviewing [`kp`](../behaviors/key-press.md) and then use the sidebar to review the others available within ZMK.
+For documentation on the available behaviors for use in keymaps, see the [overview page for behaviors](../behaviors/index.mdx).
 
 ## Metadata
 
@@ -543,7 +554,7 @@ Add additional bindings as necessary to match the default number of encoders on 
 
 ### GitHub Actions
 
-Using GitHub Actions to build your new firmware can save you from doing any local [development setup](./setup.mdx),
+Using GitHub Actions to build your new firmware can save you from doing any local [development setup](./setup/index.md),
 at the expense of a longer feedback loop if there are issues. To push your changes and trigger a build:
 
 - Add all your pending changes with `git add .`
@@ -555,7 +566,7 @@ Once pushed, click on the "Actions" tab of the repo you created in the first ste
 ### Local Build
 
 :::note
-To build locally, be sure you've followed the [development setup](./setup.mdx) guide first.
+To build locally, be sure you've followed the [development setup](./setup/index.md) guide first.
 :::
 
 Once you've fully created the new keyboard shield definition,
