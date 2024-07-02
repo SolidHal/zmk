@@ -284,11 +284,16 @@ bindings = <
         };
 
 
+
+// the two extra notes on the left of the main chord breakdown are:
+// "Y" aka D_4 aka the 7th of the octave below
+// "H" aka C_4 aka the 6th of the octave below
+
         major_Eb {
 bindings = <
-   &trans  &trans &trans   &trans &trans                                              &none     &midi NOTE_F_4   &midi NOTE_Ab_4  &midi NOTE_C_5     &midi NOTE_Eb_5
-   &trans   &trans  &trans  &trans &trans                                              &none     &midi NOTE_Eb_4   &midi NOTE_G_4   &midi NOTE_Bb_4     &midi NOTE_D_5
-   &trans   &trans  &trans  &trans &trans                                              &none     &midi NOTE_Eb_3   &midi NOTE_G_3  &midi NOTE_Bb_3     &midi NOTE_D_4
+   &trans  &trans &trans   &trans &trans                                               &midi NOTE_D_5     &midi NOTE_F_5   &midi NOTE_Ab_5  &midi NOTE_C_6     &midi NOTE_Eb_6
+   &trans   &trans  &trans  &trans &trans                                              &midi NOTE_C_5     &midi NOTE_Eb_5   &midi NOTE_G_5   &midi NOTE_Bb_5     &midi NOTE_D_6
+   &trans  &trans  &trans   &trans &trans                                              &midi NOTE_C_4     &midi NOTE_Eb_4   &midi NOTE_G_4  &midi NOTE_Bb_4     &midi NOTE_D_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                                              &none  &none &none     &none  &none &none
                                                     &none &none     &none  &midi SUSTAIN
@@ -297,9 +302,9 @@ bindings = <
 
         major_Bb {
 bindings = <
-   &trans   &trans  &trans &trans &trans                                               &none     &midi NOTE_C_5   &midi NOTE_Eb_5  &midi NOTE_G_5     &midi NOTE_Bb_5
+   &trans   &trans  &trans &trans &trans                                               &none     &midi NOTE_C_6   &midi NOTE_Eb_6  &midi NOTE_G_6     &midi NOTE_Bb_6
+   &none   &none  &none    &none &none                                              &none     &midi NOTE_Bb_5   &midi NOTE_D_6   &midi NOTE_F_6     &midi NOTE_A_6
    &none   &none  &none    &none &none                                              &none     &midi NOTE_Bb_4   &midi NOTE_D_5   &midi NOTE_F_5     &midi NOTE_A_5
-   &none   &none  &none    &none &none                                              &none     &midi NOTE_Bb_3   &midi NOTE_D_4   &midi NOTE_F_4     &midi NOTE_A_4
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                                              &none  &none &none     &none  &none &none
                                                     &none &none     &none  &midi SUSTAIN
@@ -308,9 +313,9 @@ bindings = <
 
         major_F {
 bindings = <
-   &mo MA_Eb   &mo MA_Bb  &none &mo MA_C &mo MA_G                                               &none     &midi NOTE_G_4   &midi NOTE_Bb_4  &midi NOTE_D_5     &midi NOTE_F_5
+   &mo MA_Eb   &mo MA_Bb  &none &mo MA_C &mo MA_G                                               &none     &midi NOTE_G_5   &midi NOTE_Bb_5  &midi NOTE_D_6     &midi NOTE_F_6
+   &none   &none  &none    &none &none                                              &none     &midi NOTE_F_5   &midi NOTE_A_5   &midi NOTE_C_6     &midi NOTE_E_6
    &none   &none  &none    &none &none                                              &none     &midi NOTE_F_4   &midi NOTE_A_4   &midi NOTE_C_5     &midi NOTE_E_5
-   &none   &none  &none    &none &none                                              &none     &midi NOTE_F_3   &midi NOTE_A_3   &midi NOTE_C_4     &midi NOTE_E_4
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                                              &none  &none &none     &none  &none &none
                                                     &none &none     &none  &midi SUSTAIN
@@ -342,3 +347,9 @@ bindings = <
 
     };
 };
+
+
+// each major scale has a root note and then goes
+// 2 2 1 2 2 2 1
+// each minor scale
+// 2 1 2 2 1 2 2
