@@ -9,7 +9,7 @@
 #include <zmk/midi_keys.h>
 
 // in hid.c
-#define ZMK_MIDI_NUM_KEYS 0x100
+#define ZMK_MIDI_NUM_KEYS (MIDI_MAX_NOTE + 1)
 
 // should come after the last ZMK_HID_REPORT_ID in hid.h
 #define ZMK_REPORT_ID_MIDI 0x04
@@ -25,6 +25,7 @@
 
 #define ZMK_MIDI_TOGGLE_ON 0x7F
 #define ZMK_MIDI_TOGGLE_OFF 0x0
+
 
 // Analogous to zmk_hid_mouse_report_body in hid.h
 struct zmk_midi_key_report_body {
