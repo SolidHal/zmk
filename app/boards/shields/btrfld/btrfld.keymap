@@ -149,14 +149,14 @@
             #binding-cells = <0>;
             bindings
             = <&macro_press &mo MA_Eb>
-            , <&macro_press &midi NOTE_Eb_4>
-            , <&macro_press &midi NOTE_G_4>
-            , <&macro_press &midi NOTE_Bb_4>
+            , <&macro_press &midi NOTE_Eb_5>
+            , <&macro_press &midi NOTE_G_5>
+            , <&macro_press &midi NOTE_Bb_5>
             , <&macro_pause_for_release>
             , <&macro_release &mo MA_Eb>
-            , <&macro_release &midi NOTE_Eb_4>
-            , <&macro_release &midi NOTE_G_4>
-            , <&macro_release &midi NOTE_Bb_4>
+            , <&macro_release &midi NOTE_Eb_5>
+            , <&macro_release &midi NOTE_G_5>
+            , <&macro_release &midi NOTE_Bb_5>
             ;
         };
 
@@ -263,23 +263,23 @@ bindings = <
 
         midi_base {
 bindings = <
-   &mo MA_Eb   &mo MA_Bb  &mo MA_F &mo MA_C &mo MA_G                                           &none     &none   &none  &none     &none
+   &mo MA_Eb   &mo MA_Bb  &mo MA_F &mo MA_C &mo MA_G                             &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                                             &none  &none &none     &none  &none &none
-                                                    &mo CHORD &tog CHORD     &none  &midi SUSTAIN
+                                  &none  &tog CHORD &tog MIDI_BASE_2     &midi OCT_DOWN  &midi OCT_UP &none
+                                         &mo CHORD  &mo  MIDI_BASE_2     &none  &midi SUSTAIN
             >;
         };
 
         midi_base_2 {
 bindings = <
-   &mo MA_D   &mo MA_A  &mo MA_E &mo MA_B &mo MA_Fs                                           &none     &none   &none  &none     &none
+   &mo MA_D   &mo MA_A  &mo MA_E &mo MA_B &mo MA_Fs                              &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                                             &none  &none &none     &none  &none &none
-                                                    &mo CHORD &tog CHORD     &none  &midi SUSTAIN
+                                    &none  &tog CHORD &tog MIDI_BASE     &midi OCT_DOWN  &midi OCT_UP &none
+                                           &mo CHORD  &mo MIDI_BASE     &none  &midi SUSTAIN
             >;
         };
 
@@ -295,19 +295,19 @@ bindings = <
    &trans   &trans  &trans  &trans &trans                                              &midi NOTE_C_5     &midi NOTE_Eb_5   &midi NOTE_G_5   &midi NOTE_Bb_5     &midi NOTE_D_6
    &trans  &trans  &trans   &trans &trans                                              &midi NOTE_C_4     &midi NOTE_Eb_4   &midi NOTE_G_4  &midi NOTE_Bb_4     &midi NOTE_D_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                                             &none  &none &none     &none  &none &none
-                                                    &none &none     &none  &midi SUSTAIN
+                                             &trans  &trans &trans     &trans  &trans &trans
+                                                    &trans &trans     &trans  &trans
             >;
         };
 
         major_Bb {
 bindings = <
    &trans   &trans  &trans &trans &trans                                               &none     &midi NOTE_C_6   &midi NOTE_Eb_6  &midi NOTE_G_6     &midi NOTE_Bb_6
-   &none   &none  &none    &none &none                                              &none     &midi NOTE_Bb_5   &midi NOTE_D_6   &midi NOTE_F_6     &midi NOTE_A_6
-   &none   &none  &none    &none &none                                              &none     &midi NOTE_Bb_4   &midi NOTE_D_5   &midi NOTE_F_5     &midi NOTE_A_5
+   &trans   &trans  &trans  &trans &trans                                              &none     &midi NOTE_Bb_5   &midi NOTE_D_6   &midi NOTE_F_6     &midi NOTE_A_6
+   &trans   &trans  &trans  &trans &trans                                              &none     &midi NOTE_Bb_4   &midi NOTE_D_5   &midi NOTE_F_5     &midi NOTE_A_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                                             &none  &none &none     &none  &none &none
-                                                    &none &none     &none  &midi SUSTAIN
+                                             &trans  &trans &trans     &trans  &trans &trans
+                                                    &trans &trans     &trans  &trans
             >;
         };
 
@@ -317,8 +317,8 @@ bindings = <
    &none   &none  &none    &none &none                                              &none     &midi NOTE_F_5   &midi NOTE_A_5   &midi NOTE_C_6     &midi NOTE_E_6
    &none   &none  &none    &none &none                                              &none     &midi NOTE_F_4   &midi NOTE_A_4   &midi NOTE_C_5     &midi NOTE_E_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                                             &none  &none &none     &none  &none &none
-                                                    &none &none     &none  &midi SUSTAIN
+                                             &trans  &trans &trans     &trans  &trans &trans
+                                                    &trans &trans     &trans  &trans
             >;
         };
 
