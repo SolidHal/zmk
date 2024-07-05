@@ -100,11 +100,12 @@ void usb_status_callback(struct usb_cfg_data *cfg, enum usb_dc_status_code cb_st
 }
 
 static void midi_out_ep_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status) {
-    LOG_DBG("midi_out_ep_cb is not implemented");
+   // not implemented
 }
 
 static void midi_in_ep_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status) {
-    LOG_DBG("midi_in_ep_cb is not implemented");
+    k_sem_give(&midi_sem);
+    LOG_DBG("released midi semaphore");
 }
 
 static struct usb_ep_cfg_data midi_ep_cfg[] = {{
@@ -166,22 +167,23 @@ static int zmk_usb_midi_send(uint8_t cable_number, uint8_t *midi_bytes, size_t l
     case USB_DC_UNKNOWN:
         return -ENODEV;
     default:
-        k_sem_take(&midi_sem, K_MSEC(30));
-        LOG_INF("doing midi usb_write");
+        if (k_sem_take(&midi_sem, K_MSEC(30)) != 0){
+            LOG_ERR("Failed to send midi packet, usb busy");
+            return -EBUSY;
+        };
         uint32_t num_written_bytes = 0;
         int ret = usb_write(ZMK_USB_MIDI_EP_IN, packet.bytes, 4, &num_written_bytes);
         if (ret < 0) {
-            LOG_INF("usb_midi usb write error %d", ret);
+            LOG_ERR("usb_midi usb write error %d", ret);
+            k_sem_give(&midi_sem);
         }
+
+        if (num_written_bytes < 4) {
+          LOG_ERR("failed to write all 4 bytes, only wrote %d", num_written_bytes);
+          k_sem_give(&midi_sem);
+        }
+
         LOG_INF("completed midi usb write %d", ret);
-
-        // TODO error if num_written_bytes != 4, make sure to release sem on error like usb_hid.c
-
-        // TODO usb_hid.c holds the sem until its in_ready_cb is hit. do we have something like
-        // this? usb status seems to be different, perhaps that is using hid status? anyway, for now
-        // just release the sem right after we transmit
-
-        k_sem_give(&midi_sem);
 
         return 0;
     }
