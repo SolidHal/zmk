@@ -13,6 +13,14 @@ static struct zmk_midi_report midi_report = {
     .report_id = ZMK_REPORT_ID_MIDI,
     .body = {.cin = MIDI_INVALID, .key = MIDI_INVALID, .key_value = MIDI_INVALID}};
 
+
+// ended_midi_report lets us precompute additional zmk_midi_reports
+// while handling a keypress
+// it gets sent from high index to low index
+// so if there are 3 more reports to be sent
+// it sends the report at index 2, then 1, then 0
+static struct zmk_midi_report extended_midi_reports[3];
+
 static bool sustain_toggle_on = false;
 static bool sostenuto_toggle_on = false;
 
@@ -56,8 +64,37 @@ void zmk_midi_report_clear() {
     midi_report.body.key_value = MIDI_INVALID;
 }
 
+void zmk_midi_report_move(struct zmk_midi_report* source, struct zmk_midi_report* dest) {
+    LOG_DBG("Moving report");
+    dest->body.cin = source->body.cin;
+    dest->body.key = source->body.key;
+    dest->body.key_value = source->body.key_value;
+
+    source->body.cin = MIDI_INVALID;
+    source->body.key = MIDI_INVALID;
+    source->body.key_value = MIDI_INVALID;
+}
+
+int zmk_midi_fill_next_report(const zmk_midi_key_t key, int report_count){
+    LOG_INF("zmk_midi_fill_next_report received: 0x%04x aka %d and report_num: %d", key, key, report_count);
+
+    if (report_count > 0){
+      // send the next report
+      zmk_midi_report_move(&extended_midi_reports[report_count - 1], &midi_report);
+
+      return report_count - 1;
+    }
+
+    return 0;
+}
+
 int zmk_midi_key_press(const zmk_midi_key_t key) {
     LOG_INF("zmk_midi_key_press received: 0x%04x aka %d", key, key);
+
+    // sometimes we can't send everything in one report
+    // but we need to return so our caller can notify the endpoints
+    // our report is ready
+    int queued_report_count = 0;
 
     switch (key) {
     case MIDI_MIN_NOTE ... MIDI_MAX_NOTE:
@@ -83,10 +120,21 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
                 // since there will be 2 releases before we want
                 // to turn off the toggle
                 // dont set the toggle on here!
+
+                // the reference midi devices send two
+                // values, 0, then 127
+                // when turning on sustain
+                // so lets do that too
                 zmk_midi_report_clear();
                 midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
                 midi_report.body.key = control_key_transformed;
-                midi_report.body.key_value = ZMK_MIDI_TOGGLE_ON;
+                midi_report.body.key_value = ZMK_MIDI_TOGGLE_MID;
+
+                extended_midi_reports[0].body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+                extended_midi_reports[0].body.key = control_key_transformed;
+                extended_midi_reports[0].body.key_value = ZMK_MIDI_TOGGLE_ON;
+                queued_report_count = 1;
+
             } else {
                 zmk_midi_report_clear();
                 return -EINPROGRESS;
@@ -120,7 +168,7 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
             zmk_midi_report_clear();
             LOG_INF("midi control handling not implemented");
         }
-        return 0;
+        return queued_report_count;
         break;
     default:
         LOG_ERR("Unsupported midi key %d", key);
@@ -128,11 +176,16 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
         break;
     }
 
-    return 0;
+    return queued_report_count;
 }
 
 int zmk_midi_key_release(const zmk_midi_key_t key) {
     LOG_INF("zmk_midi_key_release received: 0x%04x aka %d", key, key);
+
+    // sometimes we can't send everything in one report
+    // but we need to return so our caller can notify the endpoints
+    // our report is ready
+    int queued_report_count = 0;
 
     switch (key) {
     case MIDI_MIN_NOTE ... MIDI_MAX_NOTE:
@@ -160,7 +213,7 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
           }
         }
 
-        return 0;
+        return queued_report_count;
         break;
     case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
         zmk_midi_key_t control_key_transformed = (uint8_t)key;
@@ -173,11 +226,22 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
                 zmk_midi_report_clear();
                 return -EINPROGRESS;
             } else if (sustain_toggle_on) {
+
+                // the reference midi devices send two
+                // values, 90, then 0
+                // when turning off sustain
+                // so lets do that too
+
                 sustain_toggle_on = false;
                 zmk_midi_report_clear();
                 midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
                 midi_report.body.key = control_key_transformed;
-                midi_report.body.key_value = ZMK_MIDI_TOGGLE_OFF;
+                midi_report.body.key_value = ZMK_MIDI_TOGGLE_MID;
+
+                extended_midi_reports[0].body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+                extended_midi_reports[0].body.key = control_key_transformed;
+                extended_midi_reports[0].body.key_value = ZMK_MIDI_TOGGLE_OFF;
+                queued_report_count = 1;
             }
         } else if (SOSTENUTO == key) {
             if (!sostenuto_toggle_on) {
@@ -199,14 +263,14 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
             zmk_midi_report_clear();
             LOG_INF("midi control handling not implemented");
         }
-        return 0;
+        return queued_report_count;
         break;
     default:
         LOG_ERR("Unsupported midi key %d", key);
         return -EINVAL;
     }
 
-    return 0;
+    return queued_report_count;
 }
 void zmk_midi_clear(void) { memset(&midi_report.body, 0, sizeof(midi_report.body)); }
 

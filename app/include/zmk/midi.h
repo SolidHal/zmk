@@ -26,6 +26,9 @@
 #define ZMK_MIDI_TOGGLE_ON 0x7F
 #define ZMK_MIDI_TOGGLE_OFF 0x0
 
+// toggle values like sustain tend to send an intermediary value between on/off
+#define ZMK_MIDI_TOGGLE_MID 0x5A
+
 
 // Analogous to zmk_hid_mouse_report_body in hid.h
 struct zmk_midi_key_report_body {
@@ -47,3 +50,6 @@ void zmk_midi_clear(void);
 
 // Analogous to zmk_hid_get_mouse_report in hid.h
 struct zmk_midi_report *zmk_get_midi_report();
+
+
+int zmk_midi_fill_next_report(zmk_midi_key_t key, int report_count);

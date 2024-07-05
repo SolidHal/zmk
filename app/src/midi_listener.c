@@ -15,22 +15,43 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static void listener_midi_key_pressed(const struct zmk_midi_key_state_changed *ev) {
     LOG_DBG("midi key: 0x%04X", ev->key);
-    int ret = zmk_midi_key_press(ev->key);
-    if (ret < 0) {
+    int report_count = zmk_midi_key_press(ev->key);
+    if (report_count < 0) {
         LOG_DBG("listener_midi_key_pressed received error, ignoring");
         return;
     }
     zmk_endpoints_send_midi_report();
+
+    while (report_count > 0) {
+        // zmk_midi_key_press has additional ret number of additional reports to send
+        report_count = zmk_midi_fill_next_report(ev->key, report_count);
+        if (report_count < 0) {
+          LOG_DBG("listener_midi_key_pressed received error, ignoring");
+          return;
+        }
+        zmk_endpoints_send_midi_report();
+    }
 }
 
 static void listener_midi_key_released(const struct zmk_midi_key_state_changed *ev) {
     LOG_DBG("midi key: 0x%04X", ev->key);
-    int ret = zmk_midi_key_release(ev->key);
-    if (ret < 0) {
+    int report_count = zmk_midi_key_release(ev->key);
+    if (report_count < 0) {
         LOG_DBG("listener_midi_key_released received error, ignoring");
         return;
     }
     zmk_endpoints_send_midi_report();
+
+
+    while (report_count > 0) {
+      // zmk_midi_key_release has additional ret number of additional reports to send
+      report_count = zmk_midi_fill_next_report(ev->key, report_count);
+      if (report_count < 0) {
+        LOG_DBG("listener_midi_key_pressed received error, ignoring");
+        return;
+      }
+      zmk_endpoints_send_midi_report();
+    }
 }
 
 int midi_listener(const zmk_event_t *eh) {
