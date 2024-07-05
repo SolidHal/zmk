@@ -39,7 +39,7 @@ bool bit_is_set(uint64_t map, uint32_t bit_num) {
 // no need to send an octave shifted key
 // this technically conflicts with C in the 0th MIDI octave.
 // in reality, most instruments don't even map this value so we can safely use it
-zmk_midi_key_t pressed_key_octave_shifted[ZMK_MIDI_NUM_KEYS];
+int key_last_pressed_at_octave[ZMK_MIDI_NUM_KEYS];
 
 
 zmk_midi_key_t shift_key_octave(zmk_midi_key_t orig_key_value, int shift) {
@@ -67,9 +67,7 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
         zmk_midi_key_t shifted_key = shift_key_octave(key, octave_shift);
         if (shifted_key != MIDI_INVALID){
             // only store the most recent shifted value for each key
-            // TODO this can result in missing key release values when
-            // there are more than one of the same unshifted key pressed at the same time
-            pressed_key_octave_shifted[key] = shifted_key;
+            key_last_pressed_at_octave[key] = octave_shift;
 
             midi_report.body.cin = ZMK_MIDI_CIN_NOTE_ON;
             midi_report.body.key = shifted_key;
@@ -141,14 +139,17 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
         // write an updated report
         zmk_midi_report_clear();
 
-        if (pressed_key_octave_shifted[key] != 0){
+        // if we have shifted octaves since we last observed this keys press
+        if (key_last_pressed_at_octave[key] != octave_shift){
             //we need to send the release for the previously shifted value instead
-            midi_report.body.cin = ZMK_MIDI_CIN_NOTE_OFF;
-            midi_report.body.key = pressed_key_octave_shifted[key];
-            midi_report.body.key_value = ZMK_MIDI_OFF_VELOCITY;
+            LOG_ERR("Sending key %d at octave it was pressed: %d", key, key_last_pressed_at_octave[key]);
 
-            // reset
-            pressed_key_octave_shifted[key] = 0;
+            zmk_midi_key_t shifted_key = shift_key_octave(key, key_last_pressed_at_octave[key]);
+            if (shifted_key != MIDI_INVALID){
+              midi_report.body.cin = ZMK_MIDI_CIN_NOTE_OFF;
+              midi_report.body.key = shifted_key;
+              midi_report.body.key_value = ZMK_MIDI_OFF_VELOCITY;
+            }
         }
         else{
           zmk_midi_key_t shifted_key = shift_key_octave(key, octave_shift);
