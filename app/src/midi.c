@@ -114,7 +114,9 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
         break;
     case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
         zmk_midi_key_t control_key_transformed = (uint8_t)key;
-        if (SUSTAIN == key) {
+        if (SUSTAIN_TOG == key) {
+            // sustain toggle still just sends the sustain code
+            control_key_transformed = (uint8_t)SUSTAIN;
             if (!sustain_toggle_on) {
                 // we set the toggle on in the release
                 // since there will be 2 releases before we want
@@ -153,6 +155,20 @@ int zmk_midi_key_press(const zmk_midi_key_t key) {
                 zmk_midi_report_clear();
                 return -EINPROGRESS;
             }
+        } else if (SUSTAIN == key) {
+            // the reference midi devices send two
+            // values, 0, then 127
+            // when turning on sustain
+            // so lets do that too
+            zmk_midi_report_clear();
+            midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+            midi_report.body.key = control_key_transformed;
+            midi_report.body.key_value = ZMK_MIDI_TOGGLE_MID;
+
+            extended_midi_reports[0].body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+            extended_midi_reports[0].body.key = control_key_transformed;
+            extended_midi_reports[0].body.key_value = ZMK_MIDI_TOGGLE_ON;
+            queued_report_count = 1;
         } else if (OCT_UP == key) {
             zmk_midi_report_clear();
             if (octave_shift < 10){
@@ -217,7 +233,9 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
         break;
     case MIDI_MIN_CONTROL ... MIDI_MAX_CONTROL:
         zmk_midi_key_t control_key_transformed = (uint8_t)key;
-        if (SUSTAIN == key) {
+        if (SUSTAIN_TOG == key) {
+            // sustain toggle still just sends the sustain code
+            control_key_transformed = (uint8_t)SUSTAIN;
             if (!sustain_toggle_on) {
                 // the first release we see of a toggle we should ignore
                 // otherwise it doesn't behave as a toggle!
@@ -258,6 +276,16 @@ int zmk_midi_key_release(const zmk_midi_key_t key) {
                 midi_report.body.key = control_key_transformed;
                 midi_report.body.key_value = ZMK_MIDI_TOGGLE_OFF;
             }
+        } else if (SUSTAIN == key) {
+            zmk_midi_report_clear();
+            midi_report.body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+            midi_report.body.key = control_key_transformed;
+            midi_report.body.key_value = ZMK_MIDI_TOGGLE_MID;
+
+            extended_midi_reports[0].body.cin = ZMK_MIDI_CIN_CONTROL_CHANGE;
+            extended_midi_reports[0].body.key = control_key_transformed;
+            extended_midi_reports[0].body.key_value = ZMK_MIDI_TOGGLE_OFF;
+            queued_report_count = 1;
         } else {
             // not implemented
             zmk_midi_report_clear();

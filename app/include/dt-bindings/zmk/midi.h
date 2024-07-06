@@ -217,6 +217,7 @@
 #define SOSTENUTO 0xB042
 #define OCT_UP 0xB081
 #define OCT_DOWN 0xB082
+#define SUSTAIN_TOG 0xB083
 
 // midi control sentinals
 #define MIDI_MIN_CONTROL SUSTAIN
