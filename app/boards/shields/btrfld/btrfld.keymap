@@ -20,95 +20,95 @@
 #define MIDI_BASE_2 6
 
 // Major chords
-#define MA_Eb  7
-#define MA_Bb  8
-#define MA_F  9
-#define MA_C  10
-#define MA_G  11
-#define MA_D  12
-#define MA_A  13
-#define MA_E  14
-#define MA_B  15
-#define MA_Fs  16
+#define MA_Ab  7
+#define MA_Eb  8
+#define MA_Bb  9
+#define MA_F  10
+#define MA_C  11
+#define MA_G  12
+#define MA_D  13
+#define MA_A  14
+#define MA_E  15
+#define MA_B  16
 
 // Minor Chords
-#define MI_Eb  17
-#define MI_Bb  18
-#define MI_F  19
-#define MI_C  20
-#define MI_G  21
-#define MI_D  22
-#define MI_A  23
-#define MI_E  24
-#define MI_B  25
-#define MI_Fs  26
+#define MI_Ab  17
+#define MI_Eb  18
+#define MI_Bb  19
+#define MI_F  20
+#define MI_C  21
+#define MI_G  22
+#define MI_D  23
+#define MI_A  24
+#define MI_E  25
+#define MI_B  26
 
 // 7ths 
-#define SEV_Eb  27
-#define SEV_Bb  28
-#define SEV_F  29
-#define SEV_C  30
-#define SEV_G  31
-#define SEV_D  32
-#define SEV_A  33
-#define SEV_E  34
-#define SEV_B  35
-#define SEV_Fs  36
+#define SEV_Ab  27
+#define SEV_Eb  28
+#define SEV_Bb  29
+#define SEV_F  30
+#define SEV_C  31
+#define SEV_G  32
+#define SEV_D  33
+#define SEV_A  34
+#define SEV_E  35
+#define SEV_B  36
 
 // Major 7ths
-#define MA7_Eb  37
-#define MA7_Bb  38
-#define MA7_F  39
-#define MA7_C  40
-#define MA7_G  41
-#define MA7_D  42
-#define MA7_A  43
-#define MA7_E  44
-#define MA7_B  45
-#define MA7_Fs  46
+#define MA7_Ab  37
+#define MA7_Eb  38
+#define MA7_Bb  39
+#define MA7_F  40
+#define MA7_C  41
+#define MA7_G  42
+#define MA7_D  43
+#define MA7_A  44
+#define MA7_E  45
+#define MA7_B  46
 
 // Minor 7ths
-#define MI7_Eb  47
-#define MI7_Bb  48
-#define MI7_F  49
-#define MI7_C  50
-#define MI7_G  51
-#define MI7_D  52
-#define MI7_A  53
-#define MI7_E  54
-#define MI7_B  55
-#define MI7_Fs  56
+#define MI7_Ab  47
+#define MI7_Eb  48
+#define MI7_Bb  49
+#define MI7_F  50
+#define MI7_C  51
+#define MI7_G  52
+#define MI7_D  53
+#define MI7_A  54
+#define MI7_E  55
+#define MI7_B  56
 
 // Augmented
-#define AUG_Eb  57
-#define AUG_Bb  58
-#define AUG_F  59
-#define AUG_C  60
-#define AUG_G  61
-#define AUG_D  62
-#define AUG_A  63
-#define AUG_E  64
-#define AUG_B  65
-#define AUG_Fs  66
+#define AUG_Ab  57
+#define AUG_Eb  58
+#define AUG_Bb  59
+#define AUG_F  60
+#define AUG_C  61
+#define AUG_G  62
+#define AUG_D  63
+#define AUG_A  64
+#define AUG_E  65
+#define AUG_B  66
 
 // Diminished
-#define DIM_Eb  67
-#define DIM_Bb  68
-#define DIM_F  69
-#define DIM_C  70
-#define DIM_G  71
-#define DIM_D  72
-#define DIM_A  73
-#define DIM_E  74
-#define DIM_B  75
-#define DIM_Fs  76
+#define DIM_Ab  67
+#define DIM_Eb  68
+#define DIM_Bb  69
+#define DIM_F  70
+#define DIM_C  71
+#define DIM_G  72
+#define DIM_D  73
+#define DIM_A  74
+#define DIM_E  75
+#define DIM_B  76
 
 
 //TODO these function layers come after all others, and so should have their number increased as we fill out the other layers
 // they need to be at the end because of how zmk handles layers. higher number layers are processed first
-#define CHORD 10
-#define MIDI_BASE_1_CHORD 11
-#define MIDI_BASE_2_CHORD 12
+#define CHORD 11
+#define MIDI_BASE_1_CHORD 12
+#define MIDI_BASE_2_CHORD 13
 //TODO use conditional layers for the chord key combos?
 
 
@@ -121,7 +121,7 @@
         };
 
         tri_layer_midi_base_2 {
-            if-layers = <CHORD MIDI_BASE>;
+            if-layers = <CHORD MIDI_BASE_2>;
             then-layer = <MIDI_BASE_2_CHORD>;
         };
 
@@ -138,8 +138,26 @@
         };
 
 
-//TODO problem, wait-ms is not respected on release so often the release steps get eaten before making it to the host as they all send at the same time
 
+
+// macros for each chord key, so we can switch to the chords layer and press the chords keys at the same time
+        ma_Ab: major_Ab {
+            compatible = "zmk,behavior-macro";
+            wait-ms = <2>;
+            tap-ms = <0>;
+            #binding-cells = <0>;
+            bindings
+            = <&macro_press &mo MA_Ab>
+            , <&macro_press &midi NOTE_Ab_5>
+            , <&macro_press &midi NOTE_C_6>
+            , <&macro_press &midi NOTE_Eb_6>
+            , <&macro_pause_for_release>
+            , <&macro_release &mo MA_Ab>
+            , <&macro_release &midi NOTE_Ab_5>
+            , <&macro_release &midi NOTE_C_6>
+            , <&macro_release &midi NOTE_Eb_6>
+            ;
+        };
 
 // macros for each chord key, so we can switch to the chords layer and press the chords keys at the same time
         ma_Eb: major_Eb {
@@ -157,6 +175,46 @@
             , <&macro_release &midi NOTE_Eb_5>
             , <&macro_release &midi NOTE_G_5>
             , <&macro_release &midi NOTE_Bb_5>
+            ;
+        };
+
+
+// macros for each chord key, so we can switch to the chords layer and press the chords keys at the same time
+        ma_Bb: major_Bb {
+            compatible = "zmk,behavior-macro";
+            wait-ms = <2>;
+            tap-ms = <0>;
+            #binding-cells = <0>;
+            bindings
+            = <&macro_press &mo MA_Bb>
+            , <&macro_press &midi NOTE_Bb_5>
+            , <&macro_press &midi NOTE_D_6>
+            , <&macro_press &midi NOTE_F_6>
+            , <&macro_pause_for_release>
+            , <&macro_release &mo MA_Bb>
+            , <&macro_release &midi NOTE_Bb_5>
+            , <&macro_release &midi NOTE_D_6>
+            , <&macro_release &midi NOTE_F_6>
+            ;
+        };
+
+
+// macros for each chord key, so we can switch to the chords layer and press the chords keys at the same time
+        ma_F: major_F {
+            compatible = "zmk,behavior-macro";
+            wait-ms = <2>;
+            tap-ms = <0>;
+            #binding-cells = <0>;
+            bindings
+            = <&macro_press &mo MA_F>
+            , <&macro_press &midi NOTE_F_5>
+            , <&macro_press &midi NOTE_A_5>
+            , <&macro_press &midi NOTE_C_6>
+            , <&macro_pause_for_release>
+            , <&macro_release &mo MA_F>
+            , <&macro_release &midi NOTE_F_5>
+            , <&macro_release &midi NOTE_A_5>
+            , <&macro_release &midi NOTE_C_6>
             ;
         };
 
@@ -263,7 +321,7 @@ bindings = <
 
         midi_base {
 bindings = <
-   &mo MA_Eb   &mo MA_Bb  &mo MA_F &mo MA_C &mo MA_G                             &none     &none   &none  &none     &none
+   &mo MA_Ab   &mo MA_Eb  &mo MA_Bb &mo MA_F &mo MA_C                             &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
@@ -274,7 +332,7 @@ bindings = <
 
         midi_base_2 {
 bindings = <
-   &mo MA_D   &mo MA_A  &mo MA_E &mo MA_B &mo MA_Fs                              &none     &none   &none  &none     &none
+   &mo MA_G   &mo MA_D  &mo MA_A &mo MA_E &mo MA_B                              &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &none   &none  &none    &none &none                                           &none     &none   &none  &none     &none
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
@@ -285,13 +343,25 @@ bindings = <
 
 
 
+        major_Ab {
+bindings = <
+   &none &mo MA_Eb  &mo MA_Bb &mo MA_F &mo MA_C                                        &midi NOTE_G_5     &midi NOTE_Bb_5   &midi NOTE_Db_6  &midi NOTE_F_6     &midi NOTE_Ab_6
+   &trans   &trans  &trans  &trans &trans                                              &midi NOTE_F_5     &midi NOTE_Ab_5   &midi NOTE_C_6   &midi NOTE_Eb_6     &midi NOTE_G_6
+   &trans   &trans  &trans  &trans &trans                                              &midi NOTE_F_4     &midi NOTE_Ab_4   &midi NOTE_C_5   &midi NOTE_Eb_5     &midi NOTE_G_5
+   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
+                                             &trans  &trans &trans     &trans  &trans &trans
+                                                    &trans &trans     &trans  &trans
+            >;
+        };
+
+
 // the two extra notes on the left of the main chord breakdown are:
 // "Y" aka D_4 aka the 7th of the octave below
 // "H" aka C_4 aka the 6th of the octave below
 
         major_Eb {
 bindings = <
-   &trans  &trans &trans   &trans &trans                                               &midi NOTE_D_5     &midi NOTE_F_5   &midi NOTE_Ab_5  &midi NOTE_C_6     &midi NOTE_Eb_6
+   &mo MA_Ab  &none  &mo MA_Bb &mo MA_F &mo MA_C                                       &midi NOTE_D_5     &midi NOTE_F_5   &midi NOTE_Ab_5  &midi NOTE_C_6     &midi NOTE_Eb_6
    &trans   &trans  &trans  &trans &trans                                              &midi NOTE_C_5     &midi NOTE_Eb_5   &midi NOTE_G_5   &midi NOTE_Bb_5     &midi NOTE_D_6
    &trans  &trans  &trans   &trans &trans                                              &midi NOTE_C_4     &midi NOTE_Eb_4   &midi NOTE_G_4  &midi NOTE_Bb_4     &midi NOTE_D_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
@@ -302,9 +372,9 @@ bindings = <
 
         major_Bb {
 bindings = <
-   &trans   &trans  &trans &trans &trans                                               &none     &midi NOTE_C_6   &midi NOTE_Eb_6  &midi NOTE_G_6     &midi NOTE_Bb_6
-   &trans   &trans  &trans  &trans &trans                                              &none     &midi NOTE_Bb_5   &midi NOTE_D_6   &midi NOTE_F_6     &midi NOTE_A_6
-   &trans   &trans  &trans  &trans &trans                                              &none     &midi NOTE_Bb_4   &midi NOTE_D_5   &midi NOTE_F_5     &midi NOTE_A_5
+   &mo MA_Ab  &mo MA_Eb  &none &mo MA_F &mo MA_C                             &midi NOTE_A_5     &midi NOTE_C_6   &midi NOTE_Eb_6  &midi NOTE_G_6     &midi NOTE_Bb_6
+   &trans   &trans  &trans  &trans &trans                                     &midi NOTE_G_5     &midi NOTE_Bb_5   &midi NOTE_D_6   &midi NOTE_F_6     &midi NOTE_A_6
+   &trans   &trans  &trans  &trans &trans                                     &midi NOTE_G_4     &midi NOTE_Bb_4   &midi NOTE_D_5   &midi NOTE_F_5     &midi NOTE_A_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                                              &trans  &trans &trans     &trans  &trans &trans
                                                     &trans &trans     &trans  &trans
@@ -313,14 +383,16 @@ bindings = <
 
         major_F {
 bindings = <
-   &mo MA_Eb   &mo MA_Bb  &none &mo MA_C &mo MA_G                                               &none     &midi NOTE_G_5   &midi NOTE_Bb_5  &midi NOTE_D_6     &midi NOTE_F_6
-   &none   &none  &none    &none &none                                              &none     &midi NOTE_F_5   &midi NOTE_A_5   &midi NOTE_C_6     &midi NOTE_E_6
-   &none   &none  &none    &none &none                                              &none     &midi NOTE_F_4   &midi NOTE_A_4   &midi NOTE_C_5     &midi NOTE_E_5
+   &mo MA_Ab   &mo MA_Eb  &mo MA_Bb &none &mo MA_C                          &midi NOTE_E_5     &midi NOTE_G_5   &midi NOTE_Bb_5  &midi NOTE_D_6     &midi NOTE_F_6
+   &none   &none  &none    &none &none                                      &midi NOTE_D_5     &midi NOTE_F_5   &midi NOTE_A_5   &midi NOTE_C_6     &midi NOTE_E_6
+   &none   &none  &none    &none &none                                      &midi NOTE_D_4     &midi NOTE_F_4   &midi NOTE_A_4   &midi NOTE_C_5     &midi NOTE_E_5
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                                              &trans  &trans &trans     &trans  &trans &trans
                                                     &trans &trans     &trans  &trans
             >;
         };
+
+// TODO make a generator for the major/minor layers and the chord keys
 
 // not explicitly used, but its activation is a variable to determine whether chords should make sound when pressed
         chord_indicator {
@@ -336,7 +408,7 @@ bindings = <
 
         midi_base_1_chord_on {
 bindings = <
-   &ma_Eb   &trans  &trans    &trans &trans                                           &trans     &trans   &trans  &trans     &trans
+   &ma_Ab   &ma_Eb  &ma_Bb    &ma_F &trans                                           &trans     &trans   &trans  &trans     &trans
    &trans   &trans  &trans    &trans &trans                                           &trans     &trans   &trans  &trans     &trans
    &trans   &trans  &trans    &trans &trans                                           &trans     &trans   &trans  &trans     &trans
    &trans   &trans  &trans                                                                          &trans  &trans     &trans
