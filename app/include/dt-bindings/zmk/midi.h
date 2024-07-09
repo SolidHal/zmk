@@ -12,23 +12,23 @@
 //  so standard C3 is MIDI C5 here
 
 // All NOTE_* have the identical keycode and midi code
-#define NOTE_C 0x0
-#define NOTE_Cs 0x1
-#define NOTE_Db NOTE_Cs
-#define NOTE_D 0x2
-#define NOTE_Ds 0x3
-#define NOTE_Eb NOTE_Ds
-#define NOTE_E 0x4
-#define NOTE_F 0x5
-#define NOTE_Fs 0x6
-#define NOTE_Gb NOTE_Fs
-#define NOTE_G 0x7
-#define NOTE_Gs 0x8
-#define NOTE_Ab NOTE_Gs
-#define NOTE_A 0x9
-#define NOTE_As 0xa
-#define NOTE_Bb NOTE_As
-#define NOTE_B 0xb
+#define NOTE_C_0 0x0
+#define NOTE_Cs_0 0x1
+#define NOTE_Db_0 NOTE_Cs_0
+#define NOTE_D_0 0x2
+#define NOTE_Ds_0 0x3
+#define NOTE_Eb_0 NOTE_Ds_0
+#define NOTE_E_0 0x4
+#define NOTE_F_0 0x5
+#define NOTE_Fs_0 0x6
+#define NOTE_Gb_0 NOTE_Fs_0
+#define NOTE_G_0 0x7
+#define NOTE_Gs_0 0x8
+#define NOTE_Ab_0 NOTE_Gs_0
+#define NOTE_A_0 0x9
+#define NOTE_As_0 0xa
+#define NOTE_Bb_ NOTE_As_0
+#define NOTE_B_ 0xb
 
 #define NOTE_C_1 0xc
 #define NOTE_Cs_1 0xd
@@ -206,7 +206,7 @@
 // 0x7f aka 127 is the max value
 
 // NOTE sentinals
-#define MIDI_MIN_NOTE NOTE_C
+#define MIDI_MIN_NOTE NOTE_C_0
 #define MIDI_MAX_NOTE NOTE_G_10
 #define MIDI_INVALID 0xFF
 
