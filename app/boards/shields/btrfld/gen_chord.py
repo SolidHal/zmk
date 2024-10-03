@@ -210,7 +210,70 @@ def minor_scale_notes(root_note):
     return scale
 
 
-def fill_keymap_template(scale, scale_type, left_layer):
+def fill_keymap_template_top_bottom_split(scale, scale_type, bottom_row_scale_type):
+
+    root_clean = scale[0].split("_")[1]
+
+    # if bottom_row_scale_type == MAJOR_SCALE:
+    #     bottom_layer_left = "&mo MA_Ab  &mo MA_Eb  &mo MA_Bb &mo MA_F &mo MA_C"
+    #     bottom_layer_right = "&mo MA_G  &mo MA_D  &mo MA_A &mo MA_E &mo MA_B"
+
+    # if bottom_row_scale_type == MINOR_SCALE:
+    #     bottom_layer_left = "&mo MI_Ab  &mo MI_Eb  &mo MI_Bb &mo MI_F &mo MI_C"
+    #     bottom_layer_right = "&mo MI_G  &mo MI_D  &mo MI_A &mo MI_E &mo MI_B"
+
+    if bottom_row_scale_type == MAJOR_SCALE:
+        bottom_layer_left = "&to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C"
+        bottom_layer_right = "&to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B"
+
+    if bottom_row_scale_type == MINOR_SCALE:
+        bottom_layer_left = "&to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C"
+        bottom_layer_right = "&to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B"
+
+
+    if scale_type == MAJOR_SCALE:
+        # major scale layers don't have to or mo to its own layer, as activating those causes us to leave the layer
+        KEYMAP_TEMPLATE = f"""
+        {root_clean}_{scale_type} {{
+bindings = <
+   &midi {lower_octave(scale[2])}   &midi {lower_octave(scale[4])}   &midi {lower_octave(scale[6])}  &midi {scale[1]}   &midi {scale[3]}                   &midi {scale[5]}   &midi {raise_octave(scale[0])}  &midi {raise_octave(scale[2])}  &midi {raise_octave(scale[4])}  &midi {raise_octave(scale[6])}
+   &midi {lower_octave(scale[1])}   &midi {lower_octave(scale[3])}   &midi {lower_octave(scale[5])}  &midi {scale[0]}   &midi {scale[2]}                   &midi {scale[4]}   &midi {scale[6]} &midi {raise_octave(scale[1])}  &midi {raise_octave(scale[3])}  &midi {raise_octave(scale[5])}
+   {bottom_layer_left}                                                   {bottom_layer_right} 
+   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
+                   &none  &to MI_{root_clean}  &none       &midi OCT_UP  &none &none
+                           &mo MI_{root_clean}  &none      &midi OCT_DOWN  &midi SUSTAIN
+            >;
+        }};
+        """
+
+    else:
+
+        # minor scale layers don't have to or mo to its own layer, as activating those causes us to leave the layer
+
+
+        #  minor scale layers need to mo to the second set of major scale layers, not the first
+        #  we need these because otherwise the minor chords cant
+        #  &mo to major chord layers, as the minor chord layers are "higher" number than the major chord layers
+        #  so we can hack this by &mo -ing to these instead
+
+        KEYMAP_TEMPLATE = f"""
+        {root_clean}_{scale_type} {{
+bindings = <
+   &midi {lower_octave(scale[2])}   &midi {lower_octave(scale[4])}   &midi {lower_octave(scale[6])}  &midi {scale[1]}   &midi {scale[3]}                   &midi {scale[5]}   &midi {raise_octave(scale[0])}  &midi {raise_octave(scale[2])}  &midi {raise_octave(scale[4])}  &midi {raise_octave(scale[6])}
+   &midi {lower_octave(scale[1])}   &midi {lower_octave(scale[3])}   &midi {lower_octave(scale[5])}  &midi {scale[0]}   &midi {scale[2]}                   &midi {scale[4]}   &midi {scale[6]} &midi {raise_octave(scale[1])}  &midi {raise_octave(scale[3])}  &midi {raise_octave(scale[5])}
+   {bottom_layer_left}                                                   {bottom_layer_right} 
+   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
+                   &none  &none  &to MA_{root_clean}       &midi OCT_UP  &none &none
+                           &none  &mo MA_{root_clean}_2      &midi OCT_DOWN  &midi SUSTAIN
+            >;
+        }};
+        """
+
+
+
+    return KEYMAP_TEMPLATE
+
+def fill_keymap_template_right_left_split(scale, scale_type, left_layer):
 
     sixth_oct_down = lower_octave(scale[5])
     seventh_oct_down = lower_octave(scale[6])
@@ -369,6 +432,7 @@ def generate(root_note_list):
     macros = []
     layers = []
 
+    use_left_right = False
 
     for category in category_long_to_short.keys():
         for root_note in root_note_list:
@@ -377,19 +441,31 @@ def generate(root_note_list):
             macros.append(chord_macro)
 
 
-    count = 0
-    for scale_type in [MAJOR_SCALE, MINOR_SCALE]:
-        left_layer = LEFT_LAYER_1
-        for root_note in root_note_list:
-            if count >= 5:
-                left_layer = LEFT_LAYER_2
-            scale = get_scale(root_note, scale_type)
-            layer = fill_keymap_template(scale, scale_type, left_layer)
-            layers.append(layer)
-            count += 1
 
-    for macro in macros:
-        print(macro)
+    if use_left_right:
+        count = 0
+        for scale_type in [MAJOR_SCALE, MINOR_SCALE]:
+            left_layer = LEFT_LAYER_1
+            for root_note in root_note_list:
+                if count >= 5:
+                    left_layer = LEFT_LAYER_2
+                    scale = get_scale(root_note, scale_type)
+                    layer = fill_keymap_template_right_left_split(scale, scale_type, left_layer)
+                    layers.append(layer)
+                    count += 1
+    else:
+        for scale_type in [MAJOR_SCALE, MINOR_SCALE]:
+            for root_note in root_note_list:
+                # for now, we only have access to major scales from major scales and minor scales from minor scales
+                scale = get_scale(root_note, scale_type)
+                layer = fill_keymap_template_top_bottom_split(scale, scale_type, scale_type)
+                layers.append(layer)
+
+
+
+# we aren't using the chord macros for now
+    # for macro in macros:
+    #     print(macro)
 
     for layer in layers:
         print(layer)
