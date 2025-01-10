@@ -155,6 +155,7 @@ def find_note(root_note, offset):
 # 2 2 1 2 2 2 1
 def major_scale_notes(root_note):
 
+
     offset_set = [2, 2, 1, 2, 2, 2, 1]
 
     enforce_sharp = False
@@ -210,9 +211,17 @@ def minor_scale_notes(root_note):
     return scale
 
 
-def fill_keymap_template_top_bottom_split(scale, scale_type, bottom_row_scale_type):
+def fill_keymap_template_top_bottom_split(scale, scale_type, bottom_row_scale_type, next_scale, prev_scale):
 
-    root_clean = scale[0].split("_")[1]
+    def get_root(scl):
+        return scl[0].split("_")[1]
+
+    root_clean = get_root(scale)
+
+    next_root = get_root(next_scale)
+    prev_root = get_root(prev_scale)
+    # next_chroma_root = get_root(next_chromatic_scale)
+    # prev_chroma_root = get_root(prev_chromatic_scale)
 
     # if bottom_row_scale_type == MAJOR_SCALE:
     #     bottom_layer_left = "&mo MA_Ab  &mo MA_Eb  &mo MA_Bb &mo MA_F &mo MA_C"
@@ -239,22 +248,15 @@ bindings = <
    &midi {lower_octave(scale[2])}   &midi {lower_octave(scale[4])}   &midi {lower_octave(scale[6])}  &midi {scale[1]}   &midi {scale[3]}                   &midi {scale[5]}   &midi {raise_octave(scale[0])}  &midi {raise_octave(scale[2])}  &midi {raise_octave(scale[4])}  &midi {raise_octave(scale[6])}
    &midi {lower_octave(scale[1])}   &midi {lower_octave(scale[3])}   &midi {lower_octave(scale[5])}  &midi {scale[0]}   &midi {scale[2]}                   &midi {scale[4]}   &midi {scale[6]} &midi {raise_octave(scale[1])}  &midi {raise_octave(scale[3])}  &midi {raise_octave(scale[5])}
    {bottom_layer_left}                                                   {bottom_layer_right} 
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_{root_clean}  &none       &midi OCT_UP  &none &none
-                           &mo MI_{root_clean}  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MA_{prev_root}                                                                         &to MA_{next_root}  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_{root_clean}  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_{root_clean} MA_{root_clean}  &none      &midi OCT_DOWN  &none
             >;
         }};
         """
 
     else:
 
-        # minor scale layers don't have to or mo to its own layer, as activating those causes us to leave the layer
-
-
-        #  minor scale layers need to mo to the second set of major scale layers, not the first
-        #  we need these because otherwise the minor chords cant
-        #  &mo to major chord layers, as the minor chord layers are "higher" number than the major chord layers
-        #  so we can hack this by &mo -ing to these instead
 
         KEYMAP_TEMPLATE = f"""
         {root_clean}_{scale_type} {{
@@ -262,9 +264,9 @@ bindings = <
    &midi {lower_octave(scale[2])}   &midi {lower_octave(scale[4])}   &midi {lower_octave(scale[6])}  &midi {scale[1]}   &midi {scale[3]}                   &midi {scale[5]}   &midi {raise_octave(scale[0])}  &midi {raise_octave(scale[2])}  &midi {raise_octave(scale[4])}  &midi {raise_octave(scale[6])}
    &midi {lower_octave(scale[1])}   &midi {lower_octave(scale[3])}   &midi {lower_octave(scale[5])}  &midi {scale[0]}   &midi {scale[2]}                   &midi {scale[4]}   &midi {scale[6]} &midi {raise_octave(scale[1])}  &midi {raise_octave(scale[3])}  &midi {raise_octave(scale[5])}
    {bottom_layer_left}                                                   {bottom_layer_right} 
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_{root_clean}       &midi OCT_UP  &none &none
-                           &none  &mo MA_{root_clean}_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MI_{prev_root}                                                                         &to MI_{next_root}  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_{root_clean}                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_{root_clean} MI_{root_clean}      &midi OCT_DOWN  &none
             >;
         }};
         """
@@ -426,6 +428,30 @@ def get_chord(root_note, category):
 
     return chord
 
+def get_next_note(note_list, cur_note):
+    ret = False
+    for note in note_list:
+        if ret:
+            return note
+        if note == cur_note:
+            ret = True
+
+    # if we get here, our next note is the first item in the list
+    return note_list[0]
+
+
+def get_prev_note(note_list, cur_note):
+    prev = None
+    for note in note_list:
+        if note == cur_note:
+            if prev is None:
+                # prev should only be none when we are at the first note in the list
+                return note_list[-1]
+            else:
+                return prev
+
+        prev = note
+
 
 def generate(root_note_list):
 
@@ -458,7 +484,9 @@ def generate(root_note_list):
             for root_note in root_note_list:
                 # for now, we only have access to major scales from major scales and minor scales from minor scales
                 scale = get_scale(root_note, scale_type)
-                layer = fill_keymap_template_top_bottom_split(scale, scale_type, scale_type)
+                next_scale = get_scale(get_next_note(root_note_list, root_note), scale_type)
+                prev_scale = get_scale(get_prev_note(root_note_list, root_note), scale_type)
+                layer = fill_keymap_template_top_bottom_split(scale, scale_type, scale_type, next_scale, prev_scale)
                 layers.append(layer)
 
 
@@ -478,7 +506,8 @@ def generate(root_note_list):
 read_header()
 
 
-root_note_list = ["NOTE_Ab_5",
+root_note_list = ["NOTE_Db_5",
+              "NOTE_Ab_5",
               "NOTE_Eb_5",
               "NOTE_Bb_5",
               "NOTE_F_5",
@@ -487,6 +516,7 @@ root_note_list = ["NOTE_Ab_5",
               "NOTE_D_5",
               "NOTE_A_5",
               "NOTE_E_5",
-              "NOTE_B_5"]
+              "NOTE_B_5",
+              "NOTE_Gb_5"]
 
 generate(root_note_list)

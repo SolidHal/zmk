@@ -20,34 +20,39 @@
 #define MIDI_BASE_MI 6
 
 // Major chords
-#define MA_Ab  7
-#define MA_Eb  8
-#define MA_Bb  9
-#define MA_F  10
-#define MA_C  11
-#define MA_G  12
-#define MA_D  13
-#define MA_A  14
-#define MA_E  15
-#define MA_B  16
+#define MA_Db  7
+#define MA_Ab  8
+#define MA_Eb  9
+#define MA_Bb  10
+#define MA_F  11
+#define MA_C  12
+#define MA_G  13
+#define MA_D  14
+#define MA_A  15
+#define MA_E  16
+#define MA_B  17
+#define MA_Gb 18
 
 // Minor Chords
-#define MI_Ab  17
-#define MI_Eb  18
-#define MI_Bb  19
-#define MI_F  20
-#define MI_C  21
-#define MI_G  22
-#define MI_D  23
-#define MI_A  24
-#define MI_E  25
-#define MI_B  26
+
+#define MI_Db  19
+#define MI_Ab  20
+#define MI_Eb  21
+#define MI_Bb  22
+#define MI_F  23
+#define MI_C  24
+#define MI_G  25
+#define MI_D  26
+#define MI_A  27
+#define MI_E  28
+#define MI_B  29
+#define MI_Gb 30
 
 // Major chords again
 // we need these because otherwise the minor chords cant
 // &mo to major chord layers, as the minor chord layers are "higher" number than the major chord layers
 // so we can hack this by &mo -ing to these instead
-// TODO this solution won't work, seems we go path the max # of layers and end up at default again
+// TODO this solution won't work, seems we go pase max # of layers and end up at default again
 #define MA_Ab_2  27
 #define MA_Eb_2  28
 #define MA_Bb_2  29
@@ -75,7 +80,32 @@
             bindings = <&out OUT_SHO>, <&out OUT_BLE>, <&out OUT_USB>;
         };
 
+//TODO this does not work??
 
+/**
+ * Temporarily switches to a layer ( like `&mo`) while key is held, but uses
+ * `&to` to work around the higher vs lower layer problem
+ *
+ * Params:
+ *  1. Layer to switch to on press
+ *  2. layer to switch to on release
+ *
+ * Example:
+ *  `&tmo LAYER2 LAYER1
+ */
+tmo: tmo {
+    compatible = "zmk,behavior-macro-two-param";
+    wait-ms = <0>;
+    tap-ms = <0>;
+    #binding-cells = <2>;
+    bindings
+        = <&macro_param_1to1>
+        , <&macro_press &to MACRO_PLACEHOLDER>
+        , <&macro_pause_for_release>
+        , <&macro_param_2to1>
+        , <&macro_release &to MACRO_PLACEHOLDER>
+        ;
+};
 
 
 
@@ -107,7 +137,8 @@ lm: lm {
         , <&macro_release &mo MACRO_PLACEHOLDER>
         ;
 };
-    };
+
+};
 
     keymap {
         compatible = "zmk,keymap";
@@ -183,7 +214,7 @@ bindings = <
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                             &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                              &none  &to MIDI_BASE_MI  &none       &midi OCT_UP  &none &none
-                                    &mo MIDI_BASE_MI  &none      &midi OCT_DOWN  &midi SUSTAIN
+                                    &tmo MIDI_BASE_MI MIDI_BASE_MA &none      &midi OCT_DOWN  &midi SUSTAIN
             >;
         };
 
@@ -194,7 +225,7 @@ bindings = <
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                           &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
    &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
                              &none  &none   &to MIDI_BASE_MA       &midi OCT_UP  &none &none
-                                    &none   &mo MIDI_BASE_MA      &midi OCT_DOWN  &midi SUSTAIN
+                                    &none   &tmo MIDI_BASE_MA  MIDI_BASE_MI    &midi OCT_DOWN  &midi SUSTAIN
             >;
         };
 
@@ -224,14 +255,27 @@ bindings = <
 //        };
 
 
+
+        Db_major {
+bindings = <
+   &midi NOTE_F_4   &midi NOTE_Ab_4   &midi NOTE_C_5  &midi NOTE_Eb_5   &midi NOTE_Gb_5                   &midi NOTE_Bb_5   &midi NOTE_Db_6  &midi NOTE_F_6  &midi NOTE_Ab_6  &midi NOTE_C_7
+   &midi NOTE_Eb_4   &midi NOTE_Gb_4   &midi NOTE_Bb_4  &midi NOTE_Db_5   &midi NOTE_F_5                   &midi NOTE_Ab_5   &midi NOTE_C_6 &midi NOTE_Eb_6  &midi NOTE_Gb_6  &midi NOTE_Bb_6
+   &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
+   &to MA_Db   &none  &to MI_Gb                                                                         &to MI_Ab  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_Db  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_Db MA_Db  &none      &midi OCT_DOWN  &none
+            >;
+        };
+
+
         Ab_major {
 bindings = <
    &midi NOTE_C_5   &midi NOTE_Eb_5   &midi NOTE_G_5  &midi NOTE_Bb_5   &midi NOTE_Db_6                   &midi NOTE_F_6   &midi NOTE_Ab_6  &midi NOTE_C_7  &midi NOTE_Eb_7  &midi NOTE_G_7
    &midi NOTE_Bb_4   &midi NOTE_Db_5   &midi NOTE_F_5  &midi NOTE_Ab_5   &midi NOTE_C_6                   &midi NOTE_Eb_6   &midi NOTE_G_6 &midi NOTE_Bb_6  &midi NOTE_Db_7  &midi NOTE_F_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_Ab  &none       &midi OCT_UP  &none &none
-                           &mo MI_Ab  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_Db                                                                         &to MI_Eb  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_Ab  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_Ab MA_Ab  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -241,9 +285,9 @@ bindings = <
    &midi NOTE_G_4   &midi NOTE_Bb_4   &midi NOTE_D_5  &midi NOTE_F_5   &midi NOTE_Ab_5                   &midi NOTE_C_6   &midi NOTE_Eb_6  &midi NOTE_G_6  &midi NOTE_Bb_6  &midi NOTE_D_7
    &midi NOTE_F_4   &midi NOTE_Ab_4   &midi NOTE_C_5  &midi NOTE_Eb_5   &midi NOTE_G_5                   &midi NOTE_Bb_5   &midi NOTE_D_6 &midi NOTE_F_6  &midi NOTE_Ab_6  &midi NOTE_C_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_Eb  &none       &midi OCT_UP  &none &none
-                           &mo MI_Eb  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_Ab                                                                         &to MI_Bb  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_Eb  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_Eb MA_Eb  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -253,9 +297,9 @@ bindings = <
    &midi NOTE_D_5   &midi NOTE_F_5   &midi NOTE_A_5  &midi NOTE_C_6   &midi NOTE_Eb_6                   &midi NOTE_G_6   &midi NOTE_Bb_6  &midi NOTE_D_7  &midi NOTE_F_7  &midi NOTE_A_7
    &midi NOTE_C_5   &midi NOTE_Eb_5   &midi NOTE_G_5  &midi NOTE_Bb_5   &midi NOTE_D_6                   &midi NOTE_F_6   &midi NOTE_A_6 &midi NOTE_C_7  &midi NOTE_Eb_7  &midi NOTE_G_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_Bb  &none       &midi OCT_UP  &none &none
-                           &mo MI_Bb  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_Eb                                                                         &to MI_F  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_Bb  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_Bb MA_Bb  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -265,9 +309,9 @@ bindings = <
    &midi NOTE_A_4   &midi NOTE_C_5   &midi NOTE_E_5  &midi NOTE_G_5   &midi NOTE_As_5                   &midi NOTE_D_6   &midi NOTE_F_6  &midi NOTE_A_6  &midi NOTE_C_7  &midi NOTE_E_7
    &midi NOTE_G_4   &midi NOTE_As_4   &midi NOTE_D_5  &midi NOTE_F_5   &midi NOTE_A_5                   &midi NOTE_C_6   &midi NOTE_E_6 &midi NOTE_G_6  &midi NOTE_As_6  &midi NOTE_D_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_F  &none       &midi OCT_UP  &none &none
-                           &mo MI_F  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_Bb                                                                         &to MI_C  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_F  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_F MA_F  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -277,9 +321,9 @@ bindings = <
    &midi NOTE_E_4   &midi NOTE_G_4   &midi NOTE_B_4  &midi NOTE_D_5   &midi NOTE_F_5                   &midi NOTE_A_5   &midi NOTE_C_6  &midi NOTE_E_6  &midi NOTE_G_6  &midi NOTE_B_6
    &midi NOTE_D_4   &midi NOTE_F_4   &midi NOTE_A_4  &midi NOTE_C_5   &midi NOTE_E_5                   &midi NOTE_G_5   &midi NOTE_B_5 &midi NOTE_D_6  &midi NOTE_F_6  &midi NOTE_A_6
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_C  &none       &midi OCT_UP  &none &none
-                           &mo MI_C  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_F                                                                         &to MI_G  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_C  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_C MA_C  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -289,9 +333,9 @@ bindings = <
    &midi NOTE_B_4   &midi NOTE_D_5   &midi NOTE_Fs_5  &midi NOTE_A_5   &midi NOTE_C_6                   &midi NOTE_E_6   &midi NOTE_G_6  &midi NOTE_B_6  &midi NOTE_D_7  &midi NOTE_Fs_7
    &midi NOTE_A_4   &midi NOTE_C_5   &midi NOTE_E_5  &midi NOTE_G_5   &midi NOTE_B_5                   &midi NOTE_D_6   &midi NOTE_Fs_6 &midi NOTE_A_6  &midi NOTE_C_7  &midi NOTE_E_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_G  &none       &midi OCT_UP  &none &none
-                           &mo MI_G  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_C                                                                         &to MI_D  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_G  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_G MA_G  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -301,9 +345,9 @@ bindings = <
    &midi NOTE_Fs_4   &midi NOTE_A_4   &midi NOTE_Cs_5  &midi NOTE_E_5   &midi NOTE_G_5                   &midi NOTE_B_5   &midi NOTE_D_6  &midi NOTE_Fs_6  &midi NOTE_A_6  &midi NOTE_Cs_7
    &midi NOTE_E_4   &midi NOTE_G_4   &midi NOTE_B_4  &midi NOTE_D_5   &midi NOTE_Fs_5                   &midi NOTE_A_5   &midi NOTE_Cs_6 &midi NOTE_E_6  &midi NOTE_G_6  &midi NOTE_B_6
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_D  &none       &midi OCT_UP  &none &none
-                           &mo MI_D  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_G                                                                         &to MI_A  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_D  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_D MA_D  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -313,9 +357,9 @@ bindings = <
    &midi NOTE_Cs_5   &midi NOTE_E_5   &midi NOTE_Gs_5  &midi NOTE_B_5   &midi NOTE_D_6                   &midi NOTE_Fs_6   &midi NOTE_A_6  &midi NOTE_Cs_7  &midi NOTE_E_7  &midi NOTE_Gs_7
    &midi NOTE_B_4   &midi NOTE_D_5   &midi NOTE_Fs_5  &midi NOTE_A_5   &midi NOTE_Cs_6                   &midi NOTE_E_6   &midi NOTE_Gs_6 &midi NOTE_B_6  &midi NOTE_D_7  &midi NOTE_Fs_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_A  &none       &midi OCT_UP  &none &none
-                           &mo MI_A  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_D                                                                         &to MI_E  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_A  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_A MA_A  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -325,9 +369,9 @@ bindings = <
    &midi NOTE_Gs_4   &midi NOTE_B_4   &midi NOTE_Ds_5  &midi NOTE_Fs_5   &midi NOTE_A_5                   &midi NOTE_Cs_6   &midi NOTE_E_6  &midi NOTE_Gs_6  &midi NOTE_B_6  &midi NOTE_Ds_7
    &midi NOTE_Fs_4   &midi NOTE_A_4   &midi NOTE_Cs_5  &midi NOTE_E_5   &midi NOTE_Gs_5                   &midi NOTE_B_5   &midi NOTE_Ds_6 &midi NOTE_Fs_6  &midi NOTE_A_6  &midi NOTE_Cs_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_E  &none       &midi OCT_UP  &none &none
-                           &mo MI_E  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_A                                                                         &to MI_B  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_E  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_E MA_E  &none      &midi OCT_DOWN  &none
             >;
         };
 
@@ -337,9 +381,33 @@ bindings = <
    &midi NOTE_Ds_5   &midi NOTE_Fs_5   &midi NOTE_As_5  &midi NOTE_Cs_6   &midi NOTE_E_6                   &midi NOTE_Gs_6   &midi NOTE_B_6  &midi NOTE_Ds_7  &midi NOTE_Fs_7  &midi NOTE_As_7
    &midi NOTE_Cs_5   &midi NOTE_E_5   &midi NOTE_Gs_5  &midi NOTE_B_5   &midi NOTE_Ds_6                   &midi NOTE_Fs_6   &midi NOTE_As_6 &midi NOTE_Cs_7  &midi NOTE_E_7  &midi NOTE_Gs_7
    &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &to MI_B  &none       &midi OCT_UP  &none &none
-                           &mo MI_B  &none      &midi OCT_DOWN  &midi SUSTAIN
+   &to MA_Db   &none  &to MI_E                                                                         &to MI_Gb  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_B  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_B MA_B  &none      &midi OCT_DOWN  &none
+            >;
+        };
+
+
+        Gb_major {
+bindings = <
+   &midi NOTE_Bb_4   &midi NOTE_Db_5   &midi NOTE_F_5  &midi NOTE_Ab_5   &midi NOTE_B_5                   &midi NOTE_Eb_6   &midi NOTE_Gb_6  &midi NOTE_Bb_6  &midi NOTE_Db_7  &midi NOTE_F_7
+   &midi NOTE_Ab_4   &midi NOTE_B_4   &midi NOTE_Eb_5  &midi NOTE_Gb_5   &midi NOTE_Bb_5                   &midi NOTE_Db_6   &midi NOTE_F_6 &midi NOTE_Ab_6  &midi NOTE_B_6  &midi NOTE_Eb_7
+   &to MA_Ab  &to MA_Eb  &to MA_Bb &to MA_F &to MA_C                                                   &to MA_G  &to MA_D  &to MA_A &to MA_E &to MA_B
+   &to MA_Db   &none  &to MI_B                                                                         &to MI_Db  &none     &to MA_Gb
+                &midi SUSTAIN  &to MI_Gb  &none                        &midi OCT_UP  &none  &midi SUSTAIN
+                              &tmo MI_Gb MA_Gb  &none      &midi OCT_DOWN  &none
+            >;
+        };
+
+
+        Db_minor {
+bindings = <
+   &midi NOTE_E_4   &midi NOTE_Ab_4   &midi NOTE_B_4  &midi NOTE_Eb_5   &midi NOTE_Gb_5                   &midi NOTE_A_5   &midi NOTE_Db_6  &midi NOTE_E_6  &midi NOTE_Ab_6  &midi NOTE_B_6
+   &midi NOTE_Eb_4   &midi NOTE_Gb_4   &midi NOTE_A_4  &midi NOTE_Db_5   &midi NOTE_E_5                   &midi NOTE_Ab_5   &midi NOTE_B_5 &midi NOTE_Eb_6  &midi NOTE_Gb_6  &midi NOTE_A_6
+   &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
+   &to MI_Db   &none  &to MA_Gb                                                                         &to MA_Ab  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_Db                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_Db MI_Db      &midi OCT_DOWN  &none
             >;
         };
 
@@ -349,9 +417,9 @@ bindings = <
    &midi NOTE_B_4   &midi NOTE_Eb_5   &midi NOTE_Gb_5  &midi NOTE_Bb_5   &midi NOTE_Db_6                   &midi NOTE_E_6   &midi NOTE_Ab_6  &midi NOTE_B_6  &midi NOTE_Eb_7  &midi NOTE_Gb_7
    &midi NOTE_Bb_4   &midi NOTE_Db_5   &midi NOTE_E_5  &midi NOTE_Ab_5   &midi NOTE_B_5                   &midi NOTE_Eb_6   &midi NOTE_Gb_6 &midi NOTE_Bb_6  &midi NOTE_Db_7  &midi NOTE_E_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_Ab       &midi OCT_UP  &none &none
-                           &none  &mo MA_Ab_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_Db                                                                         &to MA_Eb  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_Ab                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_Ab MI_Ab      &midi OCT_DOWN  &none
             >;
         };
 
@@ -361,9 +429,9 @@ bindings = <
    &midi NOTE_Gb_4   &midi NOTE_Bb_4   &midi NOTE_Db_5  &midi NOTE_F_5   &midi NOTE_Ab_5                   &midi NOTE_B_5   &midi NOTE_Eb_6  &midi NOTE_Gb_6  &midi NOTE_Bb_6  &midi NOTE_Db_7
    &midi NOTE_F_4   &midi NOTE_Ab_4   &midi NOTE_B_4  &midi NOTE_Eb_5   &midi NOTE_Gb_5                   &midi NOTE_Bb_5   &midi NOTE_Db_6 &midi NOTE_F_6  &midi NOTE_Ab_6  &midi NOTE_B_6
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_Eb       &midi OCT_UP  &none &none
-                           &none  &mo MA_Eb_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_Ab                                                                         &to MA_Bb  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_Eb                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_Eb MI_Eb      &midi OCT_DOWN  &none
             >;
         };
 
@@ -373,9 +441,9 @@ bindings = <
    &midi NOTE_Db_5   &midi NOTE_F_5   &midi NOTE_Ab_5  &midi NOTE_C_6   &midi NOTE_Eb_6                   &midi NOTE_Gb_6   &midi NOTE_Bb_6  &midi NOTE_Db_7  &midi NOTE_F_7  &midi NOTE_Ab_7
    &midi NOTE_C_5   &midi NOTE_Eb_5   &midi NOTE_Gb_5  &midi NOTE_Bb_5   &midi NOTE_Db_6                   &midi NOTE_F_6   &midi NOTE_Ab_6 &midi NOTE_C_7  &midi NOTE_Eb_7  &midi NOTE_Gb_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_Bb       &midi OCT_UP  &none &none
-                           &none  &mo MA_Bb_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_Eb                                                                         &to MA_F  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_Bb                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_Bb MI_Bb      &midi OCT_DOWN  &none
             >;
         };
 
@@ -385,9 +453,9 @@ bindings = <
    &midi NOTE_Gs_4   &midi NOTE_C_5   &midi NOTE_Ds_5  &midi NOTE_G_5   &midi NOTE_As_5                   &midi NOTE_Cs_6   &midi NOTE_F_6  &midi NOTE_Gs_6  &midi NOTE_C_7  &midi NOTE_Ds_7
    &midi NOTE_G_4   &midi NOTE_As_4   &midi NOTE_Cs_5  &midi NOTE_F_5   &midi NOTE_Gs_5                   &midi NOTE_C_6   &midi NOTE_Ds_6 &midi NOTE_G_6  &midi NOTE_As_6  &midi NOTE_Cs_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_F       &midi OCT_UP  &none &none
-                           &none  &mo MA_F_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_Bb                                                                         &to MA_C  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_F                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_F MI_F      &midi OCT_DOWN  &none
             >;
         };
 
@@ -397,9 +465,9 @@ bindings = <
    &midi NOTE_Ds_4   &midi NOTE_G_4   &midi NOTE_As_4  &midi NOTE_D_5   &midi NOTE_F_5                   &midi NOTE_Gs_5   &midi NOTE_C_6  &midi NOTE_Ds_6  &midi NOTE_G_6  &midi NOTE_As_6
    &midi NOTE_D_4   &midi NOTE_F_4   &midi NOTE_Gs_4  &midi NOTE_C_5   &midi NOTE_Ds_5                   &midi NOTE_G_5   &midi NOTE_As_5 &midi NOTE_D_6  &midi NOTE_F_6  &midi NOTE_Gs_6
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_C       &midi OCT_UP  &none &none
-                           &none  &mo MA_C_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_F                                                                         &to MA_G  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_C                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_C MI_C      &midi OCT_DOWN  &none
             >;
         };
 
@@ -409,9 +477,9 @@ bindings = <
    &midi NOTE_As_4   &midi NOTE_D_5   &midi NOTE_F_5  &midi NOTE_A_5   &midi NOTE_C_6                   &midi NOTE_Ds_6   &midi NOTE_G_6  &midi NOTE_As_6  &midi NOTE_D_7  &midi NOTE_F_7
    &midi NOTE_A_4   &midi NOTE_C_5   &midi NOTE_Ds_5  &midi NOTE_G_5   &midi NOTE_As_5                   &midi NOTE_D_6   &midi NOTE_F_6 &midi NOTE_A_6  &midi NOTE_C_7  &midi NOTE_Ds_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_G       &midi OCT_UP  &none &none
-                           &none  &mo MA_G_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_C                                                                         &to MA_D  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_G                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_G MI_G      &midi OCT_DOWN  &none
             >;
         };
 
@@ -421,9 +489,9 @@ bindings = <
    &midi NOTE_F_4   &midi NOTE_A_4   &midi NOTE_C_5  &midi NOTE_E_5   &midi NOTE_G_5                   &midi NOTE_As_5   &midi NOTE_D_6  &midi NOTE_F_6  &midi NOTE_A_6  &midi NOTE_C_7
    &midi NOTE_E_4   &midi NOTE_G_4   &midi NOTE_As_4  &midi NOTE_D_5   &midi NOTE_F_5                   &midi NOTE_A_5   &midi NOTE_C_6 &midi NOTE_E_6  &midi NOTE_G_6  &midi NOTE_As_6
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_D       &midi OCT_UP  &none &none
-                           &none  &mo MA_D_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_G                                                                         &to MA_A  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_D                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_D MI_D      &midi OCT_DOWN  &none
             >;
         };
 
@@ -433,9 +501,9 @@ bindings = <
    &midi NOTE_C_5   &midi NOTE_E_5   &midi NOTE_G_5  &midi NOTE_B_5   &midi NOTE_D_6                   &midi NOTE_F_6   &midi NOTE_A_6  &midi NOTE_C_7  &midi NOTE_E_7  &midi NOTE_G_7
    &midi NOTE_B_4   &midi NOTE_D_5   &midi NOTE_F_5  &midi NOTE_A_5   &midi NOTE_C_6                   &midi NOTE_E_6   &midi NOTE_G_6 &midi NOTE_B_6  &midi NOTE_D_7  &midi NOTE_F_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_A       &midi OCT_UP  &none &none
-                           &none  &mo MA_A_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_D                                                                         &to MA_E  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_A                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_A MI_A      &midi OCT_DOWN  &none
             >;
         };
 
@@ -445,9 +513,9 @@ bindings = <
    &midi NOTE_G_4   &midi NOTE_B_4   &midi NOTE_D_5  &midi NOTE_Fs_5   &midi NOTE_A_5                   &midi NOTE_C_6   &midi NOTE_E_6  &midi NOTE_G_6  &midi NOTE_B_6  &midi NOTE_D_7
    &midi NOTE_Fs_4   &midi NOTE_A_4   &midi NOTE_C_5  &midi NOTE_E_5   &midi NOTE_G_5                   &midi NOTE_B_5   &midi NOTE_D_6 &midi NOTE_Fs_6  &midi NOTE_A_6  &midi NOTE_C_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_E       &midi OCT_UP  &none &none
-                           &none  &mo MA_E_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_A                                                                         &to MA_B  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_E                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_E MI_E      &midi OCT_DOWN  &none
             >;
         };
 
@@ -457,14 +525,23 @@ bindings = <
    &midi NOTE_D_5   &midi NOTE_Fs_5   &midi NOTE_A_5  &midi NOTE_Cs_6   &midi NOTE_E_6                   &midi NOTE_G_6   &midi NOTE_B_6  &midi NOTE_D_7  &midi NOTE_Fs_7  &midi NOTE_A_7
    &midi NOTE_Cs_5   &midi NOTE_E_5   &midi NOTE_G_5  &midi NOTE_B_5   &midi NOTE_D_6                   &midi NOTE_Fs_6   &midi NOTE_A_6 &midi NOTE_Cs_7  &midi NOTE_E_7  &midi NOTE_G_7
    &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
-   &to DEFAULT_L   &none  &none                                                                          &none  &none     &none
-                   &none  &none  &to MA_B       &midi OCT_UP  &none &none
-                           &none  &mo MA_B_2      &midi OCT_DOWN  &midi SUSTAIN
+   &to MI_Db   &none  &to MA_E                                                                         &to MA_Gb  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_B                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_B MI_B      &midi OCT_DOWN  &none
             >;
         };
 
 
-
+        Gb_minor {
+bindings = <
+   &midi NOTE_A_4   &midi NOTE_Db_5   &midi NOTE_E_5  &midi NOTE_Ab_5   &midi NOTE_B_5                   &midi NOTE_D_6   &midi NOTE_Gb_6  &midi NOTE_A_6  &midi NOTE_Db_7  &midi NOTE_E_7
+   &midi NOTE_Ab_4   &midi NOTE_B_4   &midi NOTE_D_5  &midi NOTE_Gb_5   &midi NOTE_A_5                   &midi NOTE_Db_6   &midi NOTE_E_6 &midi NOTE_Ab_6  &midi NOTE_B_6  &midi NOTE_D_7
+   &to MI_Ab  &to MI_Eb  &to MI_Bb &to MI_F &to MI_C                                                   &to MI_G  &to MI_D  &to MI_A &to MI_E &to MI_B
+   &to MI_Db   &none  &to MA_B                                                                         &to MA_Db  &none     &to MI_Gb
+            &midi SUSTAIN  &none  &to MA_Gb                       &midi OCT_UP    &none &midi SUSTAIN
+                           &none  &tmo MA_Gb MI_Gb      &midi OCT_DOWN  &none
+            >;
+        };
 
 // each major scale has a root note and then goes
 // 2 2 1 2 2 2 1
