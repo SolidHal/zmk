@@ -46,7 +46,7 @@
 //                                         |NUM_LAYER| l_ctrl  |                      |   TAB   |ARROW_LAYER|
 
 bindings = <
-      &kp Q     &kp W     &kp E     &kp R      &kp T                                               &kp Y     &kp U     &kp I     &kp O     &kp P   
+      &kp Q     &kp W     &kp E     &kp R      &kp T                                               &kp Y     &kp U     &kp I     &kp O     &kp P
       &kp A     &kp S     &kp D     &kp F      &kp G                                               &kp H     &kp J     &kp K     &kp L     &kp SEMI
       &kp Z     &kp X     &kp C     &kp V      &kp B                                               &kp N     &kp M     &kp COMMA &kp DOT   &kp FSLH
     &out_td &kp C_VOL_DN &kp C_VOL_UP                                                                                   &kp LALT  &kp DEL   &bt BT_SHO
@@ -67,11 +67,10 @@ bindings = <
         };
 
         arrow_layer {
-bindings = <
       &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                               &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
-    &bootloader  &none  &none   &none   &none                                                &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
-   &bt BT_CLR    &none &none    &none   &none                                                &kp HOME    &none       &none     &kp END    &to GAME_L
-      &trans    &trans  &trans                                                                                        &trans     &trans       &trans
+    &none  &none  &none   &none   &to MIDI_BASE_MA                                            &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
+        &none    &none &none    &none   &none                                                &kp HOME    &none       &none     &kp END    &to GAME_L
+      &trans    &bt BT_CLR  &bootloader                                                                                  &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
                                              &trans   &trans                        &trans   &trans
             >;
@@ -79,7 +78,7 @@ bindings = <
 
         game_layer {
 bindings = <
-      &kp Q     &kp W     &kp E     &kp R      &kp T                                               &kp Y     &kp U     &kp I     &kp O     &kp P   
+      &kp Q     &kp W     &kp E     &kp R      &kp T                                               &kp Y     &kp U     &kp I     &kp O     &kp P
       &kp A     &kp S     &kp D     &kp F      &kp G                                               &kp H     &kp J     &kp K     &kp L     &kp SEMI
       &kp Z     &kp X     &kp C     &kp V      &kp B                                               &kp N     &kp M     &kp COMMA &kp DOT   &kp FSLH
       &kp N0     &kp N1   &kp N2                                                                                       &kp N3  &kp N4      &kp N5
@@ -91,7 +90,7 @@ bindings = <
         game_function_layer {
 bindings = <
       &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                               &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
-    &bootloader  &none  &none   &none   &none                                                &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
+      &none  &none  &none   &none   &none                                                &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
       &none     &none   &none   &none   &none                                                &none       &none       &none     &none  &to DEFAULT_L
       &trans    &trans  &trans                                                                                       &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
