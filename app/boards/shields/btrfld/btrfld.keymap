@@ -52,9 +52,9 @@
 //                                         |NUM_LAYER| l_ctrl  |                      |   TAB   |ARROW_LAYER|
 
 bindings = <
-      &kp Q     &kp W     &kp E     &kp R      &kp T                                               &kp Y     &kp U     &kp I     &kp O     &kp P
-      &kp A     &kp S     &kp D     &kp F      &kp G                                               &kp H     &kp J     &kp K     &kp L     &kp SEMI
-      &kp Z     &kp X     &kp C     &kp V      &kp B                                               &kp N     &kp M     &kp COMMA &kp DOT   &kp FSLH
+      &kp Q     &kp D     &kp R     &kp W      &kp B                                               &kp J     &kp F     &kp U     &kp P     &kp SEMI
+      &kp A     &kp S     &kp H     &kp T      &kp G                                               &kp Y     &kp N     &kp E     &kp O     &kp I
+      &kp Z    &kp X     &kp M     &kp C      &kp V                                               &kp K     &kp L     &kp COMMA &kp DOT   &kp FSLH
     &out_td &kp C_VOL_DN &kp C_VOL_UP                                                                                   &kp LALT  &kp DEL   &bt BT_SHO
                                   &kp LGUI    &kp SPC   &kp ESC                         &kp BSPC  &kp LSHFT  &kp ENTER
                                               &mo NUM_L &kp LCTRL                       &kp TAB   &mo ARROW_L
