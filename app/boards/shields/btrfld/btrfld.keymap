@@ -69,7 +69,7 @@ bindings = <
         arrow_layer {
 bindings = <
     &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                               &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
-    &bt BT_SEL 0  &none  &none   &none   &to MIDI_BASE_MA                                            &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
+    &bt BT_SEL 0  &none  &none   &none   &none                                            &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
     &bt BT_SEL 1    &none &none    &none   &none                                                &kp HOME    &none       &none     &kp END    &to GAME_L
     &bt BT_SEL 2    &bt BT_CLR  &bootloader                                                                                  &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
