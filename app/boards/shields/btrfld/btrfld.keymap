@@ -12,8 +12,9 @@
 #define DEFAULT_L  0
 #define NUM_L      1
 #define ARROW_L    2
-#define GAME_L     3
-#define GAME_FN_L 4
+#define META_L     3
+#define GAME_L     4
+#define GAME_FN_L 5
 
 
 
@@ -69,13 +70,25 @@ bindings = <
         arrow_layer {
 bindings = <
     &kp F1   &kp F2  &kp F3   &kp F4   &kp F5                                               &kp F6     &kp F7      &kp F8    &kp F9     &kp F10
-    &bt BT_SEL 0  &none  &none   &none   &none                                            &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
-    &bt BT_SEL 1    &none &none    &none   &none                                                &kp HOME    &none       &none     &kp END    &to GAME_L
-    &bt BT_SEL 2    &bt BT_CLR  &bootloader                                                                                  &trans     &trans       &trans
+    &none    &none   &none    &mo META_L   &none                                            &kp LEFT    &kp DOWN    &kp UP    &kp RIGHT  &kp F11
+    &none    &none   &none    &none   &none                                                &kp HOME    &none       &none     &kp END    &to GAME_L
+    &none    &none   &none                                                                                  &trans     &trans       &trans
                                    &trans    &trans   &trans                        &trans   &trans  &trans
                                              &trans   &trans                        &trans   &trans
             >;
         };
+
+        meta_layer {
+bindings = <
+    &none   &none  &none   &none   &none                                             &bt BT_SEL 0     &bt BT_SEL 1      &bt BT_SEL 2    &bt BT_SEL 3     &bt BT_SEL 4
+    &none   &none  &none   &trans   &none                                            &none    &none    &none    &none  &none
+    &none    &none &none    &none   &none                                           &none    &none       &none     &none    &none
+    &none    &bt BT_CLR  &bootloader                                                                                  &trans     &trans       &trans
+                                   &trans    &trans   &trans                        &trans   &trans  &trans
+                                             &trans   &trans                        &trans   &trans
+            >;
+        };
+
 
         game_layer {
 bindings = <
