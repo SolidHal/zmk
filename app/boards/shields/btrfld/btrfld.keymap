@@ -58,7 +58,7 @@ bindings = <
 
         num_layer {
 bindings = <
-  &trans   &kp GRAVE &kp MINUS &kp EQUAL   &none                                               &none     &kp N7    &kp N8    &kp N9     &none
+  &trans   &kp GRAVE &kp MINUS &kp EQUAL   &none                                             &kp PSCRN    &kp N7    &kp N8    &kp N9     &none
   &trans   &kp LBKT  &kp RBKT   &kp BSLH   &none                                               &kp N0    &kp N4    &kp N5    &kp N6     &none
   &trans   &kp SEMI   &kp SQT   &kp FSLH   &none                                               &kp DOT   &kp N1    &kp N2    &kp N3    &none
   &trans    &trans    &trans                                                                                      &trans   &trans    &trans
